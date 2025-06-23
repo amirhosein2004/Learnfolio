@@ -1,0 +1,186 @@
+############################
+# 📦 Global Ignores
+############################
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.swp
+*.swo
+*.tmp
+*.bak
+*.orig
+*.rej
+*.tar.gz
+*.zip
+*.iws
+*.class
+*.tmp
+*~
+
+############################
+# 🐍 Python / Django
+############################
+
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+env/
+venv/
+ENV/
+VENV/
+env.bak/
+venv.bak/
+.venv/
+.Python
+
+# Django files
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+static_root/
+instance/
+local_settings.py
+*.pot
+*.mo
+*.log
+
+# Django migrations (optional)
+**/migrations/*.py
+**/migrations/*.pyc
+
+# Coverage & testing
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+junit.xml
+
+# Packaging
+build/
+dist/
+downloads/
+sdist/
+develop-eggs/
+.eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+*.manifest
+*.spec
+wheels/
+lib/
+lib64/
+parts/
+var/
+
+# Tools
+.mypy_cache/
+.python-version
+celerybeat-schedule.*
+*.sage.py
+.ipynb_checkpoints
+
+############################
+# ⚛️ React / Node.js (frontend)
+############################
+
+# Dependencies
+frontend/node_modules/
+
+# Builds
+frontend/build/
+frontend/.next/
+frontend/out/
+
+# Environment files
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.test
+frontend/.env.production
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Cache & testing
+frontend/.cache/
+frontend/.turbo/
+frontend/coverage/
+frontend/.nyc_output/
+frontend/.parcel-cache/
+
+############################
+# 🧠 Editor / IDE files
+############################
+
+# PyCharm / IntelliJ
+.idea/
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/aws.xml
+.idea/**/contentModel.xml
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+.idea/**/gradle.xml
+.idea/**/libraries
+atlassian-ide-plugin.xml
+out/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+
+# Other
+sftp-config.json
+Control.last-run
+Control.ca-list
+Control.ca-bundle
+Control.system-ca-bundle
+GitHub.sublime-settings
+
+############################
+# 💻 OS-specific files
+############################
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
