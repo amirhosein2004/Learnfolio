@@ -38,6 +38,7 @@ env.bak/
 venv.bak/
 .venv/
 .Python
+.env
 
 # Django files
 *.sqlite3

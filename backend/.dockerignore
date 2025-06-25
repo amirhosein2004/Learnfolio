@@ -1,0 +1,56 @@
+# 🐍 Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# 🧪 Test artifacts
+.coverage
+.tox/
+.noseids
+.pytest_cache/
+
+# 🗃 IDE/editor config files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 🔒 Env files and secrets
+.env
+.env.*
+*.pem
+*.key
+
+# 🧪 SQLite dev DB (if used)
+*.sqlite3
+
+# 📝 Logs
+*.log
+
+# ⚙️ OS-generated files
+.DS_Store
+Thumbs.db
+
+# 📦 Package files
+*.egg
+*.egg-info/
+dist/
+build/
+
+# 📂 Migrations (optional, if generated dynamically)
+# ** Only if you're auto-generating or want clean images
+# */migrations/*.py
+# */migrations/*.pyc
+
+# 📦 Compiled assets
+*.js.map
+*.css.map
+
+# 📁 Static and media files (recollected at runtime)
+staticfiles/
+media/
+static/
+
+# 🐳 Docker artifacts
+docker-compose.override.yml
