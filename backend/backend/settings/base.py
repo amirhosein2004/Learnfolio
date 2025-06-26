@@ -22,10 +22,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # third party
+    'rest_framework',
+    'corsheaders',
 ]
 
 # Middleware configuration
 MIDDLEWARE = [
+    # Third-party middleware
+    'corsheaders.middleware.CorsMiddleware', # CORS middleware for handling cross-origin requests
+
+    # Default Django middleware
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -84,3 +92,6 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CORS allowed origins
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
