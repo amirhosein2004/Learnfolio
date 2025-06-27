@@ -33,3 +33,6 @@ else:
             'PORT': os.getenv("POSTGRES_PORT", "5432"),
         }
     }
+
+# Allow all origins (only for development)
+CORS_ALLOW_ALL_ORIGINS = True 

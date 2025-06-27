@@ -13,3 +13,9 @@ DATABASES = {
 }
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Allow origins (only for product)
+CORS_ALLOWED_ORIGINS = [
+    "https://myfrontend.com",
+    "https://admin.myfrontend.com",
+]
