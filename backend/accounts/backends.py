@@ -9,13 +9,13 @@ class EmailOrPhoneBackend(ModelBackend):
     Authenticate with either email or phone_number + password.
     """
     def authenticate(self, request, username=None, password=None, **kwargs):
-        # تلاش می‌کنیم از روی ایمیل یا شماره، یوزر رو پیدا کنیم
+        # trying to find the user by email or number.
         user = User.objects.filter(
             models.Q(email__iexact=username) | 
             models.Q(phone_number__iexact=username)
         ).first()
 
-        # اگر یوزر پیدا شد و رمز درست بود، برگردونش
+        # If the user was found and the password was correct, return it.
         if user and user.check_password(password):
             return user
         return None

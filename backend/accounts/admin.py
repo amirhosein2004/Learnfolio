@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, AdminProfile
+from .models import User, AdminProfile, OTP
 
 # Custom admin configuration for the User model
 @admin.register(User)
@@ -32,3 +32,10 @@ class UserAdmin(BaseUserAdmin):
 class AdminProfileAdmin(admin.ModelAdmin):
     list_display = ('user',)
     search_fields = ('user__full_name', 'user__email', 'user__phone_number')
+
+# Admin config for OTP model
+@admin.register(OTP)
+class OTPAdmin(admin.ModelAdmin):
+    list_display = ('email', 'phone_number', 'code', 'purpose', 'created_at')
+    search_fields = ('email', 'phone_number', 'code')
+    list_filter = ('purpose', 'created_at')

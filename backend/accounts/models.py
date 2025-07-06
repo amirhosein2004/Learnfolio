@@ -1,11 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from .manager import UserManager, OTPManager
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 import secrets
 
-User = get_user_model()
 
 # ---------------------
 # Custom User Model
@@ -34,7 +32,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 # Admin Profile(owner site)
 # ---------------------
 class AdminProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin_profile') # One-to-one link to the custom user model
+    user = models.OneToOneField("accounts.User", on_delete=models.CASCADE, related_name='admin_profile') # One-to-one link to the custom user model
     social_networks = models.JSONField(default=dict, blank=True)
     description = models.TextField(blank=True)
 
