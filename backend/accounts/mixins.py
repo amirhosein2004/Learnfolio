@@ -19,7 +19,7 @@ class IdentityValidationMixin:
                 return value.lower()
             except DjangoValidationError:
                 raise serializers.ValidationError(
-                    " ایمیل نامعتبر است. لطفاً یک ایمیل معتبر مانند example@example.com وارد کنید"
+                    "وارد کنید example@example.com ایمیل نامعتبر است. لطفاً یک ایمیل معتبر مانند "
                 )
 
         # --- Try phone validation

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from .manager import UserManager, OTPManager
+from .managers import UserManager, OTPManager
 from django.utils import timezone
 import secrets
 

@@ -10,7 +10,12 @@ class IdentitySerializer(serializers.Serializer, IdentityValidationMixin):
     Serializer to validate a user's identity (email or phone number).
     Often used as the first step before sending an OTP.
     """
-    identity = serializers.CharField()
+    identity = serializers.CharField(required=True, allow_blank=False,
+        error_messages={
+            'blank': ".لطفاً ایمیل یا شماره تلفن را وارد کنید",
+            'required': ".وارد کردن ایمیل یا شماره تلفن الزامی است"
+        }
+    )
 
     def validate_identity(self, value):
         # Uses IdentityValidationMixin to normalize and validate the identity.
