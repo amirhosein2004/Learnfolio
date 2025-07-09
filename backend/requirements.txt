@@ -3,3 +3,4 @@ djangorestframework==3.16.0
 psycopg[binary]==3.2.9
 python-dotenv==1.1.1
 django-cors-headers==4.7.0
+kavenegar==1.1.2
