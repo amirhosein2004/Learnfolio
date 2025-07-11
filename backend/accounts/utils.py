@@ -1,5 +1,5 @@
 from accounts.models import OTP
-from utils.send_sms_or_email import send_email, send_sms
+from core.utils.send_sms_or_email import send_email, send_sms
 from accounts.models import OTP
 from accounts.exceptions import SmsSendError, EmailSendError
 import secrets

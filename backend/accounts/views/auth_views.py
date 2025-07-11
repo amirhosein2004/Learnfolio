@@ -4,11 +4,13 @@ from rest_framework import status
 from accounts.serializers import IdentitySerializer
 from accounts.services.auth_services import handle_identity_submission
 from accounts.exceptions import EmailSendError, SmsSendError
+from core.throttles.throttles import CustomAnonThrottle
 
-class IdentitySubmissionView(APIView):
+class IdentitySubmissionAPIView(APIView):
     """
     Receives email or phone and sends OTP or confirmation link.
     """
+    throttle_classes = [CustomAnonThrottle] # Rate limit with Throttle
 
     def post(self, request):
         """

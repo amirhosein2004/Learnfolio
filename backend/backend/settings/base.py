@@ -116,3 +116,20 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'amirhoosenbabai82@gmail.com')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', None)
+
+# Django REST Framework settings
+REST_FRAMEWORK = {
+    # Throttling classes to limit API request rates
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',  # Limits for authenticated users
+        'rest_framework.throttling.AnonRateThrottle',  # Limits for anonymous users
+    ],
+    # Throttle rates for different user types and custom actions
+    'DEFAULT_THROTTLE_RATES': {
+        'user': os.getenv('THROTTLE_RATE_USER', '200/hour'), # for authenticated users
+        'anon': os.getenv('THROTTLE_RATE_ANON', '200/hour'), # for anonymous users
+        'custom_action': os.getenv('THROTTLE_RATE_CUSTOM', '15/minute'), # for custom actions
+    },
+    # Custom exception handler for API errors
+    'EXCEPTION_HANDLER': 'core.exceptions.exception_handlers.custom_exception_handler',
+}
