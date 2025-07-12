@@ -3,23 +3,27 @@ from rest_framework.response import Response
 from rest_framework import status
 from accounts.serializers import IdentitySerializer
 from accounts.services.auth_services import handle_identity_submission
-from accounts.exceptions import EmailSendError, SmsSendError
 from core.throttles.throttles import CustomAnonThrottle
 
 class IdentitySubmissionAPIView(APIView):
     """
-    Receives email or phone and sends OTP or confirmation link.
+    Handles identity submission (email or phone) and sends an OTP or confirmation link.
+
+    For authenticated users: sends OTP to email or phone.
+    For anonymous users: sends OTP to phone or a confirmation link to email.
+
+    Rate-limited via CustomAnonThrottle(return 429 Too Many Requests).
     """
-    throttle_classes = [CustomAnonThrottle] # Rate limit with Throttle
+    throttle_classes = [CustomAnonThrottle] # Prevent abuse by limiting request rate
 
     def post(self, request):
         """
-        Receive email or phone number and validate it.
+        POST method to validate submitted identity (email or phone)
+        and trigger OTP or confirmation link sending.
 
-        For logged-in users: send OTP to email or phone.
-        For new users: send OTP to phone, send confirmation link to email.
-
-        Returns a JSON response with the result message.
+        Returns:
+            200 OK: if identity is valid and message is sent.
+            500 Internal Server Error: if any unhandled error occurs.
         """
         serializer = IdentitySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -28,9 +32,6 @@ class IdentitySubmissionAPIView(APIView):
         try:
             message = handle_identity_submission(identity)
             return Response({'detail': message}, status=200)
-        except (EmailSendError, SmsSendError) as e:
-            # لاگ اختیاری: logger.warning(str(e))
-            return Response({'detail': str(e)}, status=502)
         except Exception as e:
             # logger.exception("Unhandled error in IdentitySubmissionView")
-            return Response({'detail': ".خطای ناشناخته‌ای رخ داده است"}, status=500)
+            return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
