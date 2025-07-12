@@ -5,8 +5,8 @@ import os
 # Define the base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from a .env file
-load_dotenv(BASE_DIR / '.env') # we can use als: load_dotenv()  
+# Load environment variables from a .env file located at the project root
+load_dotenv(BASE_DIR.parent / '.env')
 
 # General environment variables
 SECRET_KEY = os.getenv("SECRET_KEY", "insecure-default")
@@ -25,10 +25,12 @@ INSTALLED_APPS = [
 
     # Custom apps
     'accounts',
+    'core',
 
     # third party
     'rest_framework',
     'corsheaders',
+    'django_celery_beat',
 ]
 
 # Middleware configuration
@@ -133,3 +135,20 @@ REST_FRAMEWORK = {
     # Custom exception handler for API errors
     'EXCEPTION_HANDLER': 'core.exceptions.exception_handlers.custom_exception_handler',
 }
+
+# Celery configuration
+# Broker URL for Celery (default: RabbitMQ)
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'amqp://user:pass@rabbitmq:5672//')
+# Backend for storing task results (set to None to disable result storage)
+CELERY_RESULT_BACKEND = 'rpc://'  # You can change to 'redis://' or a database backend if needed
+# Accepted content types for tasks
+CELERY_ACCEPT_CONTENT = ['json']
+# Serialization format for tasks and results
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+# Retry broker connection on startup if it fails
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# Celery Beat configuration
+# Use the Django database as the scheduler for periodic Celery tasks
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

@@ -4,3 +4,6 @@ psycopg[binary]==3.2.9
 python-dotenv==1.1.1
 django-cors-headers==4.7.0
 kavenegar==1.1.2
+celery==5.5.3
+amqp==5.3.1
+django_celery_beat==2.8.1

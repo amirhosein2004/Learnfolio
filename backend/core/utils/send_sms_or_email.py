@@ -1,6 +1,7 @@
 from kavenegar import KavenegarAPI, APIException, HTTPException
 from django.conf import settings
 from django.core.mail import send_mail
+from core.exceptions.exceptions import SmsSendError, EmailSendError
 
 
 def send_sms(phone_number: str, message: str) -> bool:
@@ -11,23 +12,20 @@ def send_sms(phone_number: str, message: str) -> bool:
         phone_number (str): The recipient's phone number.
         message (str): The text message to send.
 
-    Returns:
-        bool: True if SMS was sent successfully, False otherwise.
+    Raises:
+        SmsSendError: If sending the SMS fails.
     """
     try:
         api = KavenegarAPI(settings.KAVENEGAR_API_KEY)
         params = {
-            'sender': '2000660110',  # Optional sender ID
+            'sender': '2000660110',
             'receptor': phone_number,
             'message': message,
         }
         api.sms_send(params)
-        return True
     except (APIException, HTTPException) as e:
-        # Ideally log this instead of print in production
-        print(f"❌ SMS sending failed: {e.args[0].decode('utf-8') if isinstance(e.args[0], bytes) else str(e)}")
-
-        return False
+        error_msg = e.args[0].decode('utf-8') if isinstance(e.args[0], bytes) else str(e) # Decode error message
+        raise SmsSendError(error_msg)
 
 
 def send_email(to_email: str, subject: str, message: str) -> bool:
@@ -39,8 +37,8 @@ def send_email(to_email: str, subject: str, message: str) -> bool:
         subject (str): Email subject line.
         message (str): Email body text.
 
-    Returns:
-        bool: True if email was sent successfully, False otherwise.
+    Raises:
+        EmailSendError: If sending the email fails.
     """
     try:
         send_mail(
@@ -50,8 +48,5 @@ def send_email(to_email: str, subject: str, message: str) -> bool:
             [to_email],
             fail_silently=False
         )
-        return True
     except Exception as e:
-        # Ideally log this instead of print in production
-        print(f"❌ Email sending failed: {e}")
-        return False
+        raise EmailSendError(str(e))

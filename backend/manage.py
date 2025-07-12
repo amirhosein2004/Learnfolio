@@ -1,9 +1,11 @@
 import os
 import sys
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables from a .env file
-load_dotenv()
+# Load environment variables from a .env file located in the project's root directory.
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR.parent / '.env')
 
 def main():
     """Run administrative tasks."""
