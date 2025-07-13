@@ -28,9 +28,10 @@ INSTALLED_APPS = [
     'core',
 
     # third party
-    'rest_framework',
-    'corsheaders',
-    'django_celery_beat',
+    'rest_framework',         # Enables Django REST API support
+    'corsheaders',            # Handles Cross-Origin Resource Sharing (CORS)
+    'django_celery_beat',     # Periodic task scheduler for Celery
+    'drf_spectacular',        # Auto-generates OpenAPI schema and Swagger docs
 ]
 
 # Middleware configuration
@@ -121,19 +122,22 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', None)
 
 # Django REST Framework settings
 REST_FRAMEWORK = {
-    # Throttling classes to limit API request rates
+    # Throttling
     'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.UserRateThrottle',  # Limits for authenticated users
-        'rest_framework.throttling.AnonRateThrottle',  # Limits for anonymous users
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
     ],
-    # Throttle rates for different user types and custom actions
     'DEFAULT_THROTTLE_RATES': {
-        'user': os.getenv('THROTTLE_RATE_USER', '200/hour'), # for authenticated users
-        'anon': os.getenv('THROTTLE_RATE_ANON', '200/hour'), # for anonymous users
-        'custom_action': os.getenv('THROTTLE_RATE_CUSTOM', '15/minute'), # for custom actions
+        'user': os.getenv('THROTTLE_RATE_USER', '200/hour'),
+        'anon': os.getenv('THROTTLE_RATE_ANON', '200/hour'),
+        'custom_action': os.getenv('THROTTLE_RATE_CUSTOM', '15/minute'),
     },
-    # Custom exception handler for API errors
+
+    # Exception handling
     'EXCEPTION_HANDLER': 'core.exceptions.exception_handlers.custom_exception_handler',
+
+    # Schema / documentation
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Celery configuration
