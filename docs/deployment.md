@@ -10,3 +10,28 @@
 
 ```dockerignore
 schema_docs/
+
+```
+
+# استقرار پروژه Learnfolio
+
+## پیش‌نیازها
+- Docker و docker-compose
+- تنظیم فایل .env با مقادیر مناسب
+
+## اجرای پروژه
+1. ساخت ایمیج‌ها و اجرای سرویس‌ها:
+   ```
+   docker-compose up --build
+   ```
+2. سرویس‌های اصلی:
+   - web: اجرای Django
+   - celery: اجرای workerهای Celery
+   - celery_beat: زمان‌بندی وظایف
+   - db: پایگاه داده PostgreSQL
+   - rabbitmq: message broker
+
+## نکات مهم
+- پورت 8000 برای وب، 5432 برای دیتابیس، 5672 و 15672 برای RabbitMQ
+- تنظیم متغیرهای محیطی در .env (مانند SECRET_KEY، KAVENEGAR_API_KEY و ...)
+- برای محیط production، DEBUG را False قرار دهید و ALLOWED_HOSTS را تنظیم کنید.

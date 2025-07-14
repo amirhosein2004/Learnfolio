@@ -1,0 +1,12 @@
+# مستندات Learnfolio
+
+این پوشه شامل مستندات فنی و راهنمای استفاده از پروژه Learnfolio است.
+
+## فایل‌ها
+- architecture.md: معماری پروژه
+- auth.md: مستندات احراز هویت
+- background_tasks.md: وظایف پس‌زمینه
+- database_schema.md: ساختار دیتابیس
+- deployment.md: راهنمای استقرار
+- env_vars.md: متغیرهای محیطی
+- setup.md: راهنمای راه‌اندازی پروژه
