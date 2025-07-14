@@ -1,0 +1,2 @@
+-r base.txt
+drf-spectacular==0.28.0

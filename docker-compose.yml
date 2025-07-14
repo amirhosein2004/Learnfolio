@@ -1,6 +1,9 @@
 services:
   web:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+          ENVIRONMENT: ${DJANGO_ENV}
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
@@ -11,11 +14,12 @@ services:
     depends_on:
       - db
       - rabbitmq
-    environment:
-      - DJANGO_ENV=dev
 
   celery:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+          ENVIRONMENT: ${DJANGO_ENV}
     command: celery -A backend worker --loglevel=info
     volumes:
       - ./backend:/app
@@ -27,7 +31,10 @@ services:
       - web
 
   celery_beat:
-    build: ./backend
+    build:
+      context: ./backend 
+      args:
+          ENVIRONMENT: ${DJANGO_ENV}
     command: celery -A backend beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - ./backend:/app
