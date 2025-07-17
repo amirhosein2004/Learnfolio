@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from pathlib import Path
 import os
-# from .logging_config import LOGGING_CONFIG as CUSTOM_LOGGING  
+from .logging_config import LOGGING_CONFIG as CUSTOM_LOGGING  
 
 # Define the base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -159,8 +159,9 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # LOGGING configuration
-# LOGGING_CONFIG = "logging.config.dictConfig"
-# LOGGING = CUSTOM_LOGGING
+# Tells Django to use the `dictConfig` function from the `logging.config` module to configure logging
+LOGGING_CONFIG = "logging.config.dictConfig"
+LOGGING = CUSTOM_LOGGING
 
 # Turnstile Captcha configuration
 TURNSTILE_ENABLED = os.getenv("TURNSTILE_ENABLED", "false").lower() == "true"

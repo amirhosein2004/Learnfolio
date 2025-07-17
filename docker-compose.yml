@@ -7,6 +7,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
+      - ./backend/logs:/app/logs # for log files
     ports:
       - "8000:8000"
     env_file:
@@ -23,6 +24,7 @@ services:
     command: celery -A backend worker --loglevel=info
     volumes:
       - ./backend:/app
+      - ./backend/logs:/app/logs
     env_file:
       - ./.env
     depends_on:
@@ -38,6 +40,7 @@ services:
     command: celery -A backend beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - ./backend:/app
+      - ./backend/logs:/app/logs
     env_file:
       - ./.env
     depends_on:
