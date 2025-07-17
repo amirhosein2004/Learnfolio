@@ -6,6 +6,8 @@ from accounts.services.auth_services import handle_identity_submission
 from drf_spectacular.utils import extend_schema
 from accounts.schema_docs.auth_docs import identity_submit_schema
 from core.throttles.throttles import CustomAnonThrottle
+from core.utils.captcha import verify_turnstile_token
+from core.utils.network import get_client_ip
 
 @extend_schema(**identity_submit_schema)
 class IdentitySubmissionAPIView(APIView):
@@ -14,6 +16,7 @@ class IdentitySubmissionAPIView(APIView):
 
     For authenticated users: sends OTP to email or phone.
     For anonymous users: sends OTP to phone or a confirmation link to email.
+    Includes CAPTCHA validation (Turnstile) to prevent malicious requests.
 
     Rate-limited via CustomAnonThrottle(return 429 Too Many Requests).
     """
@@ -23,7 +26,18 @@ class IdentitySubmissionAPIView(APIView):
         """
         POST method to validate submitted identity (email or phone)
         and trigger OTP or confirmation link sending.
+
+        The captcha token must be sent from the client side in the `cf-turnstile-response` field.
         """
+        captcha_token = request.data.get("cf-turnstile-response")
+        remote_ip = get_client_ip(request)
+
+        if not verify_turnstile_token(captcha_token, remoteip=remote_ip):
+            return Response(
+                {"detail": ".اعتبارسنجی کپچا ناموفق بود"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
         serializer = IdentitySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         identity = serializer.validated_data['identity']
@@ -33,4 +47,4 @@ class IdentitySubmissionAPIView(APIView):
             return Response({'detail': message}, status=200)
         except Exception as e:
             # logger.exception("Unhandled error in IdentitySubmissionView")
-            return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
+            return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)       

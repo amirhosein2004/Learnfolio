@@ -1,16 +1,17 @@
 from dotenv import load_dotenv
 from pathlib import Path
 import os
+# from .logging_config import LOGGING_CONFIG as CUSTOM_LOGGING  
 
 # Define the base directory of the project
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Load environment variables from a .env file located at the project root
 load_dotenv(BASE_DIR.parent / '.env')
 
 # General environment variables
 SECRET_KEY = os.getenv("SECRET_KEY", "insecure-default")
-DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = os.getenv("DEBUG", "false") == "true"
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',') 
 
 
@@ -156,3 +157,11 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 # Celery Beat configuration
 # Use the Django database as the scheduler for periodic Celery tasks
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# LOGGING configuration
+# LOGGING_CONFIG = "logging.config.dictConfig"
+# LOGGING = CUSTOM_LOGGING
+
+# Turnstile Captcha configuration
+TURNSTILE_ENABLED = os.getenv("TURNSTILE_ENABLED", "false").lower() == "true"
+TURNSTILE_SECRET_KEY = os.getenv("TURNSTILE_SECRET_KEY")
