@@ -8,9 +8,10 @@ class IdentityValidationMixin:
     def validate_identity(self, value):
         """
         Validates if the input is a valid email or Iranian phone number.
+        Supports Persian/Arabic digits and normalizes them.
         Returns the cleaned value or raises a validation error.
         """
-        value = value.strip()
+        value = self.normalize_digits(value.strip()) # normalize digits email or phone
 
         # --- Try email validation
         if '@' in value:
@@ -42,6 +43,20 @@ class IdentityValidationMixin:
         phone = phone.replace('0098', '0')
         phone = phone.replace('98', '0') if phone.startswith('98') else phone
         return phone
+    
+    def normalize_digits(self, text: str) -> str:
+        """
+        Converts Persian and Arabic digits in a string to English digits.
+        """
+        persian_digits = '۰۱۲۳۴۵۶۷۸۹'
+        arabic_digits = '٠١٢٣٤٥٦٧٨٩'
+        english_digits = '0123456789'
+
+        translation_table = str.maketrans(
+            persian_digits + arabic_digits,
+            english_digits * 2
+        )
+        return text.translate(translation_table)
 
     def is_valid_iranian_phone(self, phone):
         """
