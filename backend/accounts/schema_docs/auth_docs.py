@@ -1,4 +1,4 @@
-from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import OpenApiResponse, OpenApiParameter
 from accounts.serializers import IdentitySerializer
 
 identity_submit_schema = {
@@ -9,8 +9,11 @@ identity_submit_schema = {
             examples=[{"detail": "کد تایید ارسال شد."}]
         ),
         400: OpenApiResponse(
-            description="ورودی نامعتبر.",
-            examples=[{"identity": ["ورودی نامعتبر است."]}]
+            description="ورودی نامعتبر یا اعتبارسنجی کپچا ناموفق بود.",
+            examples=[
+                {"identity": ["ورودی نامعتبر است."]},
+                {"detail": "اعتبارسنجی کپچا ناموفق بود."}
+            ]
         ),
         429: OpenApiResponse(
             description="تعداد درخواست‌ها بیش از حد مجاز است.",
@@ -22,6 +25,22 @@ identity_submit_schema = {
         ),
     },
     "summary": "ارسال شناسه کاربر و دریافت کد تایید",
-    "description": "شماره موبایل یا ایمیل را دریافت می‌کند و کد تایید یا لینک تایید ارسال می‌کند.",
-    "tags": ["Authentication"]
+    "description": (
+        "این API شماره موبایل یا ایمیل کاربر را دریافت می‌کند و در صورت اعتبارسنجی موفق، "
+        "کد تایید (OTP) یا لینک تایید را ارسال می‌کند.\n\n"
+        "📌 **اعتبارسنجی کپچا (Turnstile)** الزامی است. "
+        "`cf-turnstile-response` باید در `request.data` ارسال شود.\n\n"
+        "🧠 برای کاربران ناشناس، محدودیت نرخ درخواست (Rate limit) فعال است.\n"
+        "🔐 این عملیات نیاز به احراز هویت ندارد اما محافظت شده با کپچا و throttle است."
+    ),
+    "tags": ["Authentication"],
+    "parameters": [
+        OpenApiParameter(
+            name="cf-turnstile-response",
+            type=str,
+            location=OpenApiParameter.QUERY,
+            required=True,
+            description="توکن کپچا Turnstile که از سمت کلاینت (فرانت‌اند) ارسال می‌شود."
+        )
+    ]
 }
