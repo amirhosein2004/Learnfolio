@@ -1,7 +1,10 @@
+import logging
 from django.contrib.auth.models import BaseUserManager
 from django.utils import timezone
 from django.db import models
 import secrets
+
+logger = logging.getLogger(__name__)
 
 # ---------------------
 # Custom User Manager
@@ -32,6 +35,7 @@ class UserManager(BaseUserManager):
             user.set_unusable_password()
 
         user.save(using=self._db)
+        logger.info(f"User created. Email: {email}, Phone: {phone_number}, Has password: {bool(password)}")
         return user
 
     def create_superuser(self, email=None, phone_number=None, password=None, **extra_fields):
@@ -76,11 +80,15 @@ class OTPManager(models.Manager):
         }
 
         # Delete all existing OTPs for the user
-        self.filter(**filters).delete()
+        deleted_count, _ = self.filter(**filters).delete()
+        if deleted_count:
+            logger.info(f"Deleted {deleted_count} old OTPs for {email or phone_number}")
 
         # Create and return a new OTP
-        return self.create(
+        otp = self.create(
             code=str(secrets.randbelow(1000000)).zfill(6),
             purpose=purpose,
             **filters
-        ), True
+        )
+        logger.info(f"Generated OTP for {email or phone_number} (purpose: {purpose})")
+        return otp, True

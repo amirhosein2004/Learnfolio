@@ -1,6 +1,9 @@
 '''فعلا همینجا میزاریم درون دایرکتوری utils تا بعدا اگر به بحث های امنیتی بیشتری نیاز پیدا کردیم در دایرکتوری security'''
+import logging
 import requests
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 def verify_turnstile_token(token: str = None, remoteip=None) -> bool:
     """
@@ -28,6 +31,10 @@ def verify_turnstile_token(token: str = None, remoteip=None) -> bool:
             timeout=5
         )
         result = resp.json()
+        if result.get("success", False):
+            logger.info(f"CAPTCHA verification succeeded for IP: {remoteip}")
+        else:
+            logger.warning(f"CAPTCHA verification failed for IP: {remoteip}, response: {result}")
         return result.get("success", False)
     except Exception:
         return False
