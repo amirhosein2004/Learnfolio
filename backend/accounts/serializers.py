@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .mixins import IdentityValidationMixin
-from .models import OTP
+from backend.accounts.services.otp_services import get_valid_otp
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -23,12 +23,25 @@ class IdentitySerializer(serializers.Serializer, IdentityValidationMixin):
 
 class OTPVerificationSerializer(serializers.Serializer, IdentityValidationMixin):
     """
-    Serializer for verifying an OTP code for a given purpose (login, register, or reset).
-    Requires identity, code, and purpose.
+    Serializer for verifying an OTP code and identity.
+    Requires identity and code.
     """
-    identity = serializers.CharField()
-    code = serializers.CharField(min_length=6, max_length=6)
-    purpose = serializers.ChoiceField(choices=['login', 'register', 'reset'])
+    identity = serializers.CharField(
+        required=True, allow_blank=False,
+        error_messages={
+            'blank': ".لطفاً ایمیل یا شماره تلفن را وارد کنید",
+            'required': ".وارد کردن ایمیل یا شماره تلفن الزامی است"
+        }
+    )
+    otp = serializers.CharField(
+        required=True, allow_blank=False, min_length=6, max_length=6,
+        error_messages={
+            'blank': ".کد تایید نمی‌تواند خالی باشد",
+            'required': ".کد تایید الزامی است",
+            'min_length': ".کد تایید باید 6 رقم باشد",
+            'max_length': ".کد تایید باید 6 رقم باشد"
+        }
+    )
 
     def validate_identity(self, value):
         # Normalize and validate identity (email or phone).
@@ -36,26 +49,15 @@ class OTPVerificationSerializer(serializers.Serializer, IdentityValidationMixin)
 
     def validate(self, attrs):
         """
-        Check that an OTP exists for the provided identity, code, and purpose.
-        Ensure it hasn't expired.
+        Validate the OTP code for the given identity.
+        Checks if the OTP exists, is valid, and not expired.
         """
         identity = attrs['identity']
-        code = attrs['code']
-        purpose = attrs['purpose']
+        code = attrs['otp']
 
-        filters = {'code': code, 'purpose': purpose}
-        if '@' in identity:
-            filters['email'] = identity
-        else:
-            filters['phone_number'] = identity
-
-        try:
-            otp = OTP.objects.get(**filters)    
-        except OTP.DoesNotExist:
-            raise serializers.ValidationError({"code": "کد وارد شده برای این عملیات نامعتبر یا منقضی شده است"})
-
-        if otp.is_expired():
-            raise serializers.ValidationError({"code": "کد منقضی شده است. لطفاً دوباره درخواست ارسال کد بدهید"})
+        otp, error = get_valid_otp(identity, code) # verify otp for given identity
+        if error:
+            raise serializers.ValidationError({"otp": error})
 
         attrs['otp'] = otp
         return attrs

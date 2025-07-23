@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os
 from .logging_config import LOGGING_CONFIG as CUSTOM_LOGGING  
+from datetime import timedelta
 
 # Define the base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -33,6 +34,8 @@ INSTALLED_APPS = [
     'corsheaders',            # Handles Cross-Origin Resource Sharing (CORS)
     'django_celery_beat',     # Periodic task scheduler for Celery
     'drf_spectacular',        # Auto-generates OpenAPI schema and Swagger docs
+    'rest_framework_simplejwt', # JWT authentication for REST framework
+    'rest_framework_simplejwt.token_blacklist', # Token blacklist for JWT authentication
 ]
 
 # Middleware configuration
@@ -109,6 +112,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # default fallback
 ]
 
+#********************************************************************************#
+
 # For Kavenegar SMS service
 KAVENEGAR_API_KEY = os.getenv('KAVENEGAR_API_KEY')
 
@@ -120,26 +125,6 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'amirhoosenbabai82@gmail.com')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', None)
-
-# Django REST Framework settings
-REST_FRAMEWORK = {
-    # Throttling
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.UserRateThrottle',
-        'rest_framework.throttling.AnonRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'user': os.getenv('THROTTLE_RATE_USER', '200/hour'),
-        'anon': os.getenv('THROTTLE_RATE_ANON', '200/hour'),
-        'custom_action': os.getenv('THROTTLE_RATE_CUSTOM', '15/minute'),
-    },
-
-    # Exception handling
-    'EXCEPTION_HANDLER': 'core.exceptions.exception_handlers.custom_exception_handler',
-
-    # Schema / documentation
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-}
 
 # Celery configuration
 # Broker URL for Celery (default: RabbitMQ)
@@ -166,3 +151,40 @@ LOGGING = CUSTOM_LOGGING
 # Turnstile Captcha configuration
 TURNSTILE_ENABLED = os.getenv("TURNSTILE_ENABLED", "false").lower() == "true"
 TURNSTILE_SECRET_KEY = os.getenv("TURNSTILE_SECRET_KEY")
+
+#********************************************************************************#
+
+# Django REST Framework settings
+REST_FRAMEWORK = {
+    # Throttling
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': os.getenv('THROTTLE_RATE_USER', '200/hour'),
+        'anon': os.getenv('THROTTLE_RATE_ANON', '200/hour'),
+        'custom_action': os.getenv('THROTTLE_RATE_CUSTOM', '15/minute'),
+    },
+
+    # Exception handling
+    'EXCEPTION_HANDLER': 'core.exceptions.exception_handlers.custom_exception_handler',
+
+    # Schema / documentation
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+    # JWT authentication
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+# Simple JWT settings
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),   # Short lifetime for increased security
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+}

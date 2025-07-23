@@ -9,7 +9,7 @@ import secrets
 # Custom User Model
 # ---------------------
 class User(AbstractBaseUser, PermissionsMixin):
-    full_name = models.CharField(max_length=255)
+    full_name = models.CharField(max_length=255, blank=True)
     email = models.EmailField(unique=True, null=True, blank=True)
     phone_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
 
@@ -27,6 +27,24 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email or self.phone_number or "User"
+    
+    class Meta:
+        # postgresql let us have many None values in unique fields
+        # but we want to ensure that email and phone_number are unique if they are provided
+        constraints = [
+            # Email must be unique only if provided (not None)
+            models.UniqueConstraint(
+                fields=['email'],
+                condition=~models.Q(email=None), # Checks that email is not None
+                name='unique_email_if_provided'
+            ),
+            # Phone number must be unique only if provided (not None)
+            models.UniqueConstraint(
+                fields=['phone_number'],
+                condition=~models.Q(phone_number=None), # Checks that phone_number is not None
+                name='unique_phone_if_provided'
+            )
+        ]
     
 # ---------------------
 # Admin Profile(owner site)
