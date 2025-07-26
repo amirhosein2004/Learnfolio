@@ -112,6 +112,17 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # default fallback
 ]
 
+# Redis cache configuration
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv('REDIS_LOCATION'),  # name service redis in docker-compose
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
 #********************************************************************************#
 
 # For Kavenegar SMS service
@@ -130,7 +141,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', None)
 # Broker URL for Celery (default: RabbitMQ)
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'amqp://user:pass@rabbitmq:5672//')
 # Backend for storing task results (set to None to disable result storage)
-CELERY_RESULT_BACKEND = 'rpc://'  # You can change to 'redis://' or a database backend if needed
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
 # Accepted content types for tasks
 CELERY_ACCEPT_CONTENT = ['json']
 # Serialization format for tasks and results
@@ -165,6 +176,7 @@ REST_FRAMEWORK = {
         'user': os.getenv('THROTTLE_RATE_USER', '200/hour'),
         'anon': os.getenv('THROTTLE_RATE_ANON', '200/hour'),
         'custom_action': os.getenv('THROTTLE_RATE_CUSTOM', '15/minute'),
+        'resend_otp_or_link': '3/minute',
     },
 
     # Exception handling

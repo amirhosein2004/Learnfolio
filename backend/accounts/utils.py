@@ -1,7 +1,8 @@
 from accounts.models import OTP
 from core.tasks import send_email_task, send_sms_task
 from accounts.models import OTP
-import secrets
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from django.conf import settings 
 
 # TODO: بعدا بیا سیستم پیامکی رو برای اون شرکتی که قرار داد بستی پیاده سازی اش کن
 def send_otp_for_phone(phone_number: str, purpose: str):
@@ -37,11 +38,10 @@ def send_auth_email(email: str, purpose: str, send_link: bool = False):
         str: The OTP code or confirmation link.
     """
     if send_link:
-        token = secrets.token_urlsafe(32)
-        # TODO: سیستم verify از طریق لینک را تکمیل کن
-        link = f"https://your-domain.com/verify-email/?email={email}&token={token}&purpose={purpose}"
+        token = generate_email_token(email, purpose)
+        link = f"http://localhost:8000/api/auth/verify-otp-or-link/?email={email}&token={token}&purpose={purpose}"
         subject = "لینک تایید ایمیل"
-        message = f"برای ادامه عملیات {purpose}، روی لینک زیر کلیک کنید:\n\n{link}\n\nاین لینک تا ۱۵ دقیقه معتبر است"
+        message = f"برای ادامه عملیات ، روی لینک زیر کلیک کنید:\n\n{link}\n\nاین لینک تا ۱۵ دقیقه معتبر است"
 
         # Send verification link via Celery task
         send_email_task.delay(email, subject, message)
@@ -55,3 +55,37 @@ def send_auth_email(email: str, purpose: str, send_link: bool = False):
         # Generate and send OTP via email
         send_email_task.delay(email, subject, message)
         return otp_instance.code
+
+def generate_email_token(email, purpose):
+    """
+    Generate a secure token for email verification purposes.
+    Args:
+        email (str): The user's email address.
+        purpose (str): The purpose of the token (e.g., 'register', 'reset').
+    Returns:
+        str: The generated token as a string.
+    """
+    serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
+    return serializer.dumps({'email': email, 'purpose': purpose})
+
+
+def verify_email_token(token, max_age=900):
+    """
+    Verify the given token and return the stored data (email and purpose).
+    Args:
+        token (str): The token to verify.
+        max_age (int): Maximum age of the token in seconds (default: 900, 15 minutes).
+    Returns:
+        - The stored data as a dictionary if the token is valid.
+        - An error message if the token is invalid.
+    """
+    serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
+    try:
+        data = serializer.loads(token, max_age=max_age)
+        return data, None  # None means no error
+    except SignatureExpired:
+        return None, "توکن منقضی شده است. لطفاً مجدداً درخواست دهید."
+    except BadSignature:
+        return None, "توکن نامعتبر است." # None means no data
+    except Exception as e:
+        return None, f"خطای نامشخص در اعتبارسنجی توکن: {e}"

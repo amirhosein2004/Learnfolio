@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .mixins import IdentityValidationMixin
-from backend.accounts.services.otp_services import get_valid_otp
+from accounts.mixins import IdentityValidationMixin
+from accounts.services.serializer_services import get_valid_otp, verify_email_link
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -46,6 +46,11 @@ class OTPVerificationSerializer(serializers.Serializer, IdentityValidationMixin)
     def validate_identity(self, value):
         # Normalize and validate identity (email or phone).
         return super().validate_identity(value)
+    
+    def validate_otp(self, value):
+        if not value.isdigit():
+            raise serializers.ValidationError(".کد تأیید باید فقط شامل ارقام باشد")
+        return value
 
     def validate(self, attrs):
         """
@@ -60,6 +65,44 @@ class OTPVerificationSerializer(serializers.Serializer, IdentityValidationMixin)
             raise serializers.ValidationError({"otp": error})
 
         attrs['otp'] = otp
+        return attrs
+    
+class EmailConfirmationLinkSerializer(serializers.Serializer, IdentityValidationMixin):
+    """
+    Serializer for verifying an email confirmation link.
+    Requires identity and token.
+    """
+    identity = serializers.CharField(
+        required=True, allow_blank=False,
+        error_messages={
+            'blank': ".لطفاً ایمیل یا شماره تلفن را وارد کنید",
+            'required': ".وارد کردن ایمیل یا شماره تلفن الزامی است"
+        }
+    )
+    token = serializers.CharField(
+        required=True, allow_blank=False,
+        error_messages={
+            'required': ".توکن تایید لینک الزامی است",
+            'blank': ".توکن تایید لینک نمی‌تواند خالی باشد"
+        }
+    )
+
+    def validate_identity(self, value):
+        # Normalize and validate identity (email or phone).
+        return super().validate_identity(value)
+
+    def validate(self, attrs):
+        """
+        Validate the email confirmation link.
+        Checks if the token is valid and not expired.
+        """
+        token = attrs['token']
+
+        valid, error = verify_email_link(token)
+
+        if error:
+            raise serializers.ValidationError({"token": error})
+
         return attrs
 
 class PasswordLoginSerializer(serializers.Serializer, IdentityValidationMixin):

@@ -9,7 +9,7 @@ def custom_exception_handler(exc, context):
     if isinstance(exc, Throttled):
         # Return a custom response for throttling (rate limit) errors
         custom_response_data = {
-            'detail': 'شما بیش از حد مجاز درخواست ارسال کرده‌اید. لطفاً بعداً تلاش کنید.',
+            'detail': '.شما بیش از حد مجاز درخواست ارسال کرده‌اید. لطفاً بعداً تلاش کنید',
             'available_in_seconds': exc.wait,
         }
         return Response(custom_response_data, status=429)
