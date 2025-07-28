@@ -1,5 +1,5 @@
 from drf_spectacular.utils import OpenApiResponse, OpenApiParameter
-from accounts.serializers import IdentitySerializer
+from accounts.serializers.auth_serializers import IdentitySerializer
 
 identity_submit_schema = {
     "request": IdentitySerializer,

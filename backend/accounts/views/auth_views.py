@@ -1,23 +1,34 @@
 import logging
-from rest_framework.views import APIView
-from rest_framework.response import Response
+
+from django.contrib.auth import get_user_model
+
 from rest_framework import status
-from accounts.serializers import IdentitySerializer, OTPVerificationSerializer, EmailConfirmationLinkSerializer
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from drf_spectacular.utils import extend_schema
+
+from accounts.schema_docs.auth_docs import identity_submit_schema
+from accounts.serializers.auth_serializers import (
+    IdentitySerializer,
+    OTPVerificationSerializer,
+    EmailConfirmationLinkSerializer,
+    PasswordLoginSerializer,
+)
 from accounts.services.auth_services import (
-    handle_identity_submission, 
-    handle_otp_verification ,
-    handle_link_verification, 
+    handle_identity_submission,
+    handle_otp_verification,
+    handle_link_verification,
     generate_tokens_for_user,
 )
-from accounts.services.serializer_services import (
-    can_resend, 
+from accounts.services.cache_services import (
+    can_resend,
     set_resend_cooldown,
 )
-from drf_spectacular.utils import extend_schema
-from accounts.schema_docs.auth_docs import identity_submit_schema
-from core.throttles.throttles import CustomAnonThrottle, ResendOTPOrLinkThrottle
+
 from core.decorators.captcha import captcha_required
-from django.contrib.auth import get_user_model
+from core.permissions import IsNotAuthenticated
+from core.throttles.throttles import CustomAnonThrottle, ResendOTPOrLinkThrottle
 
 User = get_user_model()
 
@@ -35,6 +46,7 @@ class IdentitySubmissionAPIView(APIView):
     Protected with: CAPTCHA (Cloudflare Turnstile) and 
     Rate-limited via CustomAnonThrottle(return 429 Too Many Requests).
     """
+    permission_classes = [IsNotAuthenticated]
     throttle_classes = [CustomAnonThrottle] # Prevent abuse by limiting request rate
 
     @captcha_required
@@ -48,9 +60,9 @@ class IdentitySubmissionAPIView(APIView):
         identity = serializer.validated_data['identity']
 
         try:
-            message, next_url = handle_identity_submission(identity)
+            message, purpose, next_url = handle_identity_submission(identity)
             set_resend_cooldown(identity, 3 * 60)  # set cache for 3 minutes
-            return Response({'detail': message, "next_url": next_url}, status=200)
+            return Response({'detail': message, "next_url": next_url, "purpose": purpose}, status=200)
         except Exception:
             logger.error(f"Error processing identity submission for {identity}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)       
@@ -67,6 +79,7 @@ class OTPOrVerificationAPIView(APIView):
     Protected with: CAPTCHA (Cloudflare Turnstile) and 
     Rate-limited via CustomAnonThrottle(return 429 Too Many Requests).
     """
+    permission_classes = [IsNotAuthenticated]
     throttle_classes = [CustomAnonThrottle]  # Prevent abuse by limiting request rate
 
     @captcha_required
@@ -83,16 +96,16 @@ class OTPOrVerificationAPIView(APIView):
 
         try:
             user, action, message = handle_otp_verification(identity=identity, otp_obj=otp)
-            tokens = generate_tokens_for_user(user)  # create JWT tokens(login)
+            jwt_tokens = generate_tokens_for_user(user)  # create JWT tokens(login)
             logger.info(f"User authenticated: {user.id}")
             return Response({
                 'detail': message,
                 'action': action,
-                'access': tokens['access'],
-                'refresh': tokens['refresh'],
+                'access': jwt_tokens['access'],
+                'refresh': jwt_tokens['refresh'],
             }, status=200)
         except Exception:
-            logger.error(f"Error processing OTP or link verification for", exc_info=True)
+            logger.error(f"Error processing OTP or link verification for {identity}", exc_info=True)
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
 
 class LinkVerificationAPIView(APIView):
@@ -107,6 +120,7 @@ class LinkVerificationAPIView(APIView):
     Protected with: CAPTCHA (Cloudflare Turnstile) and 
     Rate-limited via CustomAnonThrottle(return 429 Too Many Requests).
     """
+    permission_classes = [IsNotAuthenticated]
     throttle_classes = [CustomAnonThrottle]  # Prevent abuse by limiting request rate
     
     @captcha_required
@@ -121,16 +135,16 @@ class LinkVerificationAPIView(APIView):
 
         try:
             user, action, message = handle_link_verification(identity=identity)
-            tokens = generate_tokens_for_user(user)  # create JWT tokens(login)
+            jwt_tokens = generate_tokens_for_user(user)  # create JWT tokens(login)
             logger.info(f"User authenticated: {user.id}")
             return Response({
                 'detail': message,
                 'action': action,
-                'access': tokens['access'],
-                'refresh': tokens['refresh'],
+                'access': jwt_tokens['access'],
+                'refresh': jwt_tokens['refresh'],
             }, status=200)
         except Exception:
-            logger.error(f"Error processing OTP or link verification for", exc_info=True)
+            logger.error(f"Error processing OTP or link verification for {identity}", exc_info=True)
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
 
 
@@ -146,6 +160,7 @@ class ResendOTPOrLinkAPIView(APIView):
     Protected with: CAPTCHA (Cloudflare Turnstile) and 
     Rate-limited via ResendOTPOrLinkThrottle (returns 429 on cooldown)
     """
+    permission_classes = [IsNotAuthenticated]
     throttle_classes = [ResendOTPOrLinkThrottle]
 
     @captcha_required
@@ -169,10 +184,45 @@ class ResendOTPOrLinkAPIView(APIView):
                 status=429
             )
         try:
-            message, next_url = handle_identity_submission(identity)
+            message, purpose, next_url = handle_identity_submission(identity)
             set_resend_cooldown(identity, 3 * 60)  # set cache for 3 minutes
             logger.info(f"resending for {identity}")
-            return Response({'detail': message, "next_url": next_url}, status=200)
+            return Response({'detail': message, "next_url": next_url, "purpose": purpose}, status=200)
         except Exception:
             logger.error(f"Error resending for {identity}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
+
+class PasswordLoginAPIView(APIView):
+    """
+    validate password for user and login user
+    
+    Accepts:
+    - `identity`: Email or phone number
+    - `password`: user password
+    - `cf-turnstile-response`: CAPTCHA token (if enabled)
+
+    Protected with: CAPTCHA (Cloudflare Turnstile) and 
+    Rate-limited via ResendOTPOrLinkThrottle (returns 429 on cooldown)
+    """
+    permission_classes = [IsNotAuthenticated]
+    throttle_classes = [CustomAnonThrottle]
+
+    @captcha_required
+    def post(self, request):
+        serializer = PasswordLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        identity = serializer.validated_data['identity']
+        user = serializer.validated_data['user']
+
+        try:
+            jwt_tokens = generate_tokens_for_user(user)  # create JWT tokens(login)
+            logger.info(f"User authenticated with password: {user.id}")
+            return Response({
+                'detail': "کاربر با موفقیت وارد شد",
+                'access': jwt_tokens['access'],
+                'refresh': jwt_tokens['refresh'],
+            }, status=200)
+        except Exception:
+            logger.error(f"Error processing logging with password for identityt {identity}", exc_info=True)
+            return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)

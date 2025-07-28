@@ -1,6 +1,5 @@
 import logging
 from django.contrib.auth.models import BaseUserManager
-from django.utils import timezone
 from django.db import models
 import secrets
 

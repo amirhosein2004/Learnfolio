@@ -1,11 +1,9 @@
 from accounts.models import OTP
 from core.tasks import send_email_task, send_sms_task
-from accounts.models import OTP
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from django.conf import settings 
+from accounts.utils.token_utils import generate_email_token
 
 # TODO: بعدا بیا سیستم پیامکی رو برای اون شرکتی که قرار داد بستی پیاده سازی اش کن
-def send_otp_for_phone(phone_number: str, purpose: str):
+def send_otp_for_phone(phone_number: str, purpose: str) -> str:
     """
     Generates and sends an OTP code via SMS for the given phone number.
 
@@ -25,7 +23,7 @@ def send_otp_for_phone(phone_number: str, purpose: str):
 
     return otp_instance.code
 
-def send_auth_email(email: str, purpose: str, send_link: bool = False):
+def send_auth_email(email: str, purpose: str, send_link: bool = False) -> str:
     """
     Sends either an OTP code or a confirmation link to the user's email.
 
@@ -56,36 +54,3 @@ def send_auth_email(email: str, purpose: str, send_link: bool = False):
         send_email_task.delay(email, subject, message)
         return otp_instance.code
 
-def generate_email_token(email, purpose):
-    """
-    Generate a secure token for email verification purposes.
-    Args:
-        email (str): The user's email address.
-        purpose (str): The purpose of the token (e.g., 'register', 'reset').
-    Returns:
-        str: The generated token as a string.
-    """
-    serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
-    return serializer.dumps({'email': email, 'purpose': purpose})
-
-
-def verify_email_token(token, max_age=900):
-    """
-    Verify the given token and return the stored data (email and purpose).
-    Args:
-        token (str): The token to verify.
-        max_age (int): Maximum age of the token in seconds (default: 900, 15 minutes).
-    Returns:
-        - The stored data as a dictionary if the token is valid.
-        - An error message if the token is invalid.
-    """
-    serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
-    try:
-        data = serializer.loads(token, max_age=max_age)
-        return data, None  # None means no error
-    except SignatureExpired:
-        return None, "توکن منقضی شده است. لطفاً مجدداً درخواست دهید."
-    except BadSignature:
-        return None, "توکن نامعتبر است." # None means no data
-    except Exception as e:
-        return None, f"خطای نامشخص در اعتبارسنجی توکن: {e}"
