@@ -16,10 +16,8 @@ def custom_exception_handler(exc, context):
 
     if isinstance(exc, PermissionDenied):
         # Return a custom response for Permission errors
-        custom_response_data = {
-            'detail': '.شما مجاز به ارسال درخواست به این بخش نبستید'
-        }
-        return Response(custom_response_data, status=403)
+        detail = getattr(exc, 'detail', '.شما مجاز به ارسال درخواست به این بخش نبستید')
+        return Response({'detail': str(detail)}, status=403)
 
     # Use DRF's default exception handler for other errors
     response = exception_handler(exc, context)

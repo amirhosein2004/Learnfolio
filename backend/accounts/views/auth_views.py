@@ -8,7 +8,13 @@ from rest_framework.views import APIView
 
 from drf_spectacular.utils import extend_schema
 
-from accounts.schema_docs.auth_docs import identity_submit_schema
+from accounts.schema_docs import (
+    identity_submit_schema,
+    otp_verification_schema,
+    link_verification_schema,
+    resend_otp_or_link_schema,
+    password_login_schema,
+)
 from accounts.serializers.auth_serializers import (
     IdentitySerializer,
     OTPVerificationSerializer,
@@ -45,8 +51,10 @@ class IdentitySubmissionAPIView(APIView):
     
     Protected with: CAPTCHA (Cloudflare Turnstile) and 
     Rate-limited via CustomAnonThrottle(return 429 Too Many Requests).
+    restrict access authenticated users.
     """
-    permission_classes = [IsNotAuthenticated]
+    authentication_classes = []  # No authentication required
+    permission_classes = [IsNotAuthenticated] # Prevent authenticated users
     throttle_classes = [CustomAnonThrottle] # Prevent abuse by limiting request rate
 
     @captcha_required
@@ -61,12 +69,13 @@ class IdentitySubmissionAPIView(APIView):
 
         try:
             message, purpose, next_url = handle_identity_submission(identity)
-            set_resend_cooldown(identity, 3 * 60)  # set cache for 3 minutes
+            set_resend_cooldown(identity, 2 * 60)  # set cache for 2 minutes
             return Response({'detail': message, "next_url": next_url, "purpose": purpose}, status=200)
         except Exception:
             logger.error(f"Error processing identity submission for {identity}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)       
 
+@extend_schema(**otp_verification_schema)
 class OTPOrVerificationAPIView(APIView):
     """
     Verifies OTP codes for login and registration.
@@ -78,7 +87,9 @@ class OTPOrVerificationAPIView(APIView):
 
     Protected with: CAPTCHA (Cloudflare Turnstile) and 
     Rate-limited via CustomAnonThrottle(return 429 Too Many Requests).
+    restrict access authenticated users.
     """
+    authentication_classes = []  # No authentication required
     permission_classes = [IsNotAuthenticated]
     throttle_classes = [CustomAnonThrottle]  # Prevent abuse by limiting request rate
 
@@ -108,6 +119,7 @@ class OTPOrVerificationAPIView(APIView):
             logger.error(f"Error processing OTP or link verification for {identity}", exc_info=True)
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
 
+@extend_schema(**link_verification_schema)
 class LinkVerificationAPIView(APIView):
     """
     Verifies Confirm links for registration.
@@ -119,7 +131,9 @@ class LinkVerificationAPIView(APIView):
 
     Protected with: CAPTCHA (Cloudflare Turnstile) and 
     Rate-limited via CustomAnonThrottle(return 429 Too Many Requests).
+    restrict access authenticated users.
     """
+    authentication_classes = []  # No authentication required
     permission_classes = [IsNotAuthenticated]
     throttle_classes = [CustomAnonThrottle]  # Prevent abuse by limiting request rate
     
@@ -147,7 +161,7 @@ class LinkVerificationAPIView(APIView):
             logger.error(f"Error processing OTP or link verification for {identity}", exc_info=True)
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
 
-
+@extend_schema(**resend_otp_or_link_schema)
 class ResendOTPOrLinkAPIView(APIView):
     """
     Resends a verification OTP or confirmation link to the given identity.
@@ -159,7 +173,9 @@ class ResendOTPOrLinkAPIView(APIView):
 
     Protected with: CAPTCHA (Cloudflare Turnstile) and 
     Rate-limited via ResendOTPOrLinkThrottle (returns 429 on cooldown)
+    restrict access authenticated users.
     """
+    authentication_classes = []  # No authentication required
     permission_classes = [IsNotAuthenticated]
     throttle_classes = [ResendOTPOrLinkThrottle]
 
@@ -185,13 +201,14 @@ class ResendOTPOrLinkAPIView(APIView):
             )
         try:
             message, purpose, next_url = handle_identity_submission(identity)
-            set_resend_cooldown(identity, 3 * 60)  # set cache for 3 minutes
+            set_resend_cooldown(identity, 2 * 60)  # set cache for 2 minutes
             logger.info(f"resending for {identity}")
             return Response({'detail': message, "next_url": next_url, "purpose": purpose}, status=200)
         except Exception:
             logger.error(f"Error resending for {identity}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
 
+@extend_schema(**password_login_schema)
 class PasswordLoginAPIView(APIView):
     """
     validate password for user and login user
@@ -203,7 +220,9 @@ class PasswordLoginAPIView(APIView):
 
     Protected with: CAPTCHA (Cloudflare Turnstile) and 
     Rate-limited via ResendOTPOrLinkThrottle (returns 429 on cooldown)
+    restrict access authenticated users.
     """
+    authentication_classes = []  # No authentication required
     permission_classes = [IsNotAuthenticated]
     throttle_classes = [CustomAnonThrottle]
 

@@ -11,21 +11,18 @@
 			"item": [
 				{
 					"name": "New Request",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
 					"request": {
 						"auth": {
 							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"identity\": \"09380186731\"\r\n}",
+							"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -43,6 +40,176 @@
 								"api",
 								"auth",
 								"submit-identity",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"otp\": \"111111\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/auth/verify-otp/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"verify-otp",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNjMyODM2LCJpYXQiOjE3NTM2MzE5MzYsImp0aSI6ImIxOGVhNGE0NzkwZTQ2YjFiNzYwZmJmZjUxMzM0YzIyIiwidXNlcl9pZCI6NH0.mRL9db7vZheVZ8pKtMJaJDjnBjoENk2qSu5raNLQ8Dw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/auth/resend-otp-or-link/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"resend-otp-or-link",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"token\": \"eyJlbWFpbCI6ImFtaWlpcmlpaS5sYW1rLjEwQGdtYWlsLmNvbSIsInB1cnBvc2UiOiJyZWdpc3RlciJ9.aIUDTw.Hzmv3ehL4PFlxL21IF6ZKcoxvuE\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/auth/verify-link/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"verify-link",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNjMyODM2LCJpYXQiOjE3NTM2MzE5MzYsImp0aSI6ImIxOGVhNGE0NzkwZTQ2YjFiNzYwZmJmZjUxMzM0YzIyIiwidXNlcl9pZCI6NH0.mRL9db7vZheVZ8pKtMJaJDjnBjoENk2qSu5raNLQ8Dw",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"identity\": \"09111111111\",\r\n    \"password\": \"amir1234\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/auth/login-password/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"login-password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNjMyODM2LCJpYXQiOjE3NTM2MzE5MzYsImp0aSI6ImIxOGVhNGE0NzkwZTQ2YjFiNzYwZmJmZjUxMzM0YzIyIiwidXNlcl9pZCI6NH0.mRL9db7vZheVZ8pKtMJaJDjnBjoENk2qSu5raNLQ8Dw\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000//api/auth/token/refresh/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"",
+								"api",
+								"auth",
+								"token",
+								"refresh",
 								""
 							]
 						}

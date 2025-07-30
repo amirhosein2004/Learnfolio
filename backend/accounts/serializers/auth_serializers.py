@@ -8,16 +8,17 @@ from accounts.services.validation_services import (
     validate_user_with_password,
     verify_email_link,
 )
+from core.serializers import CaptchaSerializer
 
 User = get_user_model()
 
-class IdentitySerializer(BaseIdentitySerializer):
+class IdentitySerializer(BaseIdentitySerializer, CaptchaSerializer):
     """
     Serializer to validate a user's identity (email or phone number).
     """
     pass
 
-class OTPVerificationSerializer(BaseIdentitySerializer):
+class OTPVerificationSerializer(BaseIdentitySerializer, CaptchaSerializer):
     """
     Serializer for verifying an OTP code and identity.
     Requires identity and code.
@@ -52,7 +53,7 @@ class OTPVerificationSerializer(BaseIdentitySerializer):
         attrs['otp'] = otp
         return attrs
     
-class EmailConfirmationLinkSerializer(BaseIdentitySerializer):
+class EmailConfirmationLinkSerializer(BaseIdentitySerializer, CaptchaSerializer):
     """
     Serializer for verifying an email confirmation link.
     Requires identity and token.
@@ -86,16 +87,16 @@ class EmailConfirmationLinkSerializer(BaseIdentitySerializer):
 
         return attrs
 
-class PasswordLoginSerializer(BaseIdentitySerializer):
+class PasswordLoginSerializer(BaseIdentitySerializer, CaptchaSerializer):
     """
     Serializer for logging in with identity (email or phone) and password.
     """
     password = serializers.CharField(
-        write_only=True, required=True, allow_blank=False, min_length=6,
+        write_only=True, required=True, allow_blank=False, min_length=8,
         error_messages={
             'required': ".وارد کردن رمز عبور الزامی است",
             'blank': ".رمز عبور نمی‌تواند خالی باشد",
-            'min_length': ".رمز عبور باید حداقل ۶ کاراکتر باشد",
+            'min_length': ".رمز عبور باید حداقل ۸ کاراکتر باشد",
         }
     )
 

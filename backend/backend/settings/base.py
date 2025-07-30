@@ -199,3 +199,13 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API مستندات',
+    'DESCRIPTION': 'مستندات کامل پروژه',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'ENABLE_EXAMPLES': True,  # active examples
+    'EXAMPLES_ENABLED': True, 
+}

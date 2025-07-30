@@ -68,6 +68,8 @@
 | نام متغیر              | توضیح                                     | مقدار پیش‌فرض                     |
 |------------------------|--------------------------------------------|-----------------------------------|
 | `CELERY_BROKER_URL`    | آدرس broker برای Celery                    | `amqp://user:pass@rabbitmq:5672//`|
+| `REDIS_LOCATION`       | آدرس سرور Redis برای کش        | `redis://Your-Location:6379/0`    |
+| `CELERY_RESULT_BACKEND`| بک‌اند ذخیره‌سازی نتایج Celery             | `redis://Your-Location:6379/1`    |
 | `RABBITMQ_DEFAULT_USER`| نام کاربری RabbitMQ                       | -                                 |
 | `RABBITMQ_DEFAULT_PASS`| رمز عبور RabbitMQ                         | -                                 |
 
