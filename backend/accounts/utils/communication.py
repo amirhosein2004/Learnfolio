@@ -1,4 +1,4 @@
-from accounts.models import OTP
+from accounts.services.cache_services import OTPCacheService
 from core.tasks import send_email_task, send_sms_task
 from accounts.utils.token_utils import generate_email_token
 
@@ -15,27 +15,26 @@ def send_otp_for_phone(phone_number: str, purpose: str) -> str:
         str: The generated OTP code.
 
     """
-    otp_instance, _ = OTP.objects.generate_otp(phone_number=phone_number, purpose=purpose)
-    message = f"کد شما: {otp_instance.code}"
+    otp = OTPCacheService.generate_otp(phone_number=phone_number, purpose=purpose)
+    message = f"{otp}:کد تایید شما"
 
     # Send SMS asynchronously via Celery
     send_sms_task.delay(phone_number, message)
 
-    return otp_instance.code
+    return otp
 
-def send_auth_email(email: str, purpose: str, send_link: bool = False) -> str:
+def send_auth_email(email: str, purpose: str) -> str:
     """
     Sends either an OTP code or a confirmation link to the user's email.
 
     Args:
         email (str): Recipient's email address.
         purpose (str): Purpose of the verification (e.g., 'login', 'register', 'reset password').
-        send_link (bool): If True, sends a confirmation link instead of a code.
 
     Returns:
         str: The OTP code or confirmation link.
     """
-    if send_link:
+    if purpose == "register":
         token = generate_email_token(email, purpose)
         link = f"http://localhost:8000/api/auth/verify-otp-or-link/?email={email}&token={token}&purpose={purpose}"
         subject = "لینک تایید ایمیل"
@@ -46,11 +45,11 @@ def send_auth_email(email: str, purpose: str, send_link: bool = False) -> str:
         return link
 
     else:
-        otp_instance, _ = OTP.objects.generate_otp(email=email, purpose=purpose)
-        subject = "کد تایید ورود"
-        message = f"{otp_instance.code} :برابر است با {purpose} کد تایید شما برای"
+        otp = OTPCacheService.generate_otp(email=email, purpose=purpose)
+        subject = "کد تایید"
+        message = f"{otp}:کد تایید شما"
 
         # Generate and send OTP via email
         send_email_task.delay(email, subject, message)
-        return otp_instance.code
+        return otp
 

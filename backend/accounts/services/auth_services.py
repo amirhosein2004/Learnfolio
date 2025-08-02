@@ -7,6 +7,7 @@ from django.urls import reverse
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.utils.communication import send_otp_for_phone, send_auth_email
+from accounts.services.validation_services import get_otp_purpose
 
 logger = logging.getLogger(__name__)
 
@@ -22,74 +23,51 @@ def handle_identity_submission(identity: str) -> tuple[str, str, str]:
     Returns:
         tuple: (Result message,purpose, Next step URL)
     """
-    user = None
+    purpose = get_otp_purpose(identity)
+
     if '@' in identity:
-        user = User.objects.filter(email__iexact=identity).first()
-    else:
-        user = User.objects.filter(phone_number=identity).first()
-
-    if user:
-        # Existing user → send login OTP or email
-        if '@' in identity:
-            send_auth_email(email=identity, purpose='login', send_link=False)
-            logger.info(f"Login OTP sent to {identity}")
-            return ".کد ورود به ایمیل شما ارسال شد", 'login', reverse('accounts:verify_otp')
-        else:
-            send_otp_for_phone(phone_number=identity, purpose='login')
-            logger.info(f"Login OTP sent to {identity}")
-            return ".کد ورود برای شماره شما ارسال شد", 'login', reverse('accounts:verify_otp')
-    else:
-        # New user → send registration OTP or confirmation link
-        if '@' in identity:
-            send_auth_email(email=identity, purpose='register', send_link=True)
+        if purpose == "register":
+            # For registration, send confirmation link
+            send_auth_email(email=identity, purpose=purpose)
             logger.info(f"Registration link sent to {identity}")
-            return ".لینک ثبت‌نام به ایمیل شما ارسال شد", 'register', reverse('accounts:verify_link')
+            return ".لینک ثبت‌نام به ایمیل شما ارسال شد", purpose, reverse('accounts:verify_link')
+
         else:
-            send_otp_for_phone(phone_number=identity, purpose='register')
-            logger.info(f"Registration OTP sent to {identity}")
-            return ".کد ثبت‌نام برای شماره شما ارسال شد", 'register', reverse('accounts:verify_otp')
-        
-def handle_otp_verification(identity: str, otp_obj: Any) -> tuple[User, str, str]:
-    # TODO: بعدا برای تایید هم اضافه میکنیم
-    """
-    Verifies OTP and logs in or registers the user based on identity.
+            otp_code = send_auth_email(email=identity, purpose=purpose)
+            logger.info(f"Login OTP sent to {identity}")
+            return ".کد تایید به ایمیل شما ارسال شد", purpose, reverse('accounts:verify_otp')
+            
+    else:
+        otp_code = send_otp_for_phone(phone_number=identity, purpose=purpose)
+        logger.info(f"OTP sent to phone {identity}")
+        return f".کد تایید به شماره تلفن شما ارسال شد: {otp_code}", purpose, reverse('accounts:verify_otp')
 
+def login_or_register_user(identity: str) -> tuple[User, str, str]:
+    """
+    Log in or register a user based on their identity (email or phone number).
+    Args:
+        identity (str): The user's email or phone number.
     Returns:
-        tuple: (User instance, action: 'login' or 'register', message)
+        tuple: (User instance, action performed, success message)
     """
+    purpose = get_otp_purpose(identity)
     is_email = '@' in identity
-
-    user = (
-        User.objects.filter(email=identity).first()
-        if is_email
-        else User.objects.filter(phone_number=identity).first()
-    )
-
-    if not user:
-        user = User.objects.create_user(phone_number=identity)
+    
+    if purpose == "register":
+        # register new user
+        create_kwargs = {'email': identity} if is_email else {'phone_number': identity}
+        user = User.objects.create_user(**create_kwargs)
+        message = ".ایمیل با موفقیت تأیید شد" if is_email else ".ثبت نام با موفقیت انجام شد"
         action = "register"
-        message = ".ثبت نام با موفقیت انجام شد"
         logger.info(f"User registered: {user.id}")
     else:
+        # login existing user
+        filter_kwargs = {'email__iexact': identity} if is_email else {'phone_number': identity}
+        user = User.objects.filter(**filter_kwargs).first()
         action = "login"
         message = ".ورود با موفقیت انجام شد"
         logger.info(f"User logged in: {user.id}")
-
-    otp_obj.delete()  # delete otp
-    return user, action, message
-
-def handle_link_verification(identity: str) -> tuple[User, str, str]:
-    # TODO: بعدا برای تایید هم اضافه میکنیم
-    """
-    Registers a new user using email link verification.
-
-    Returns:
-        tuple: (User instance, action: 'register', message)
-    """
-    user = User.objects.create_user(email=identity)
-    action = "register"
-    message = ".لینک با موفقیت تایید شد"
-    logger.info(f"User registered: {user.id}")
+    
     return user, action, message
 
 def generate_tokens_for_user(user: Any) -> dict[str, str]:

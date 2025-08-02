@@ -8,6 +8,7 @@ from accounts.services.validation_services import (
     validate_user_with_password,
     verify_email_link,
 )
+from accounts.services.validation_services import get_otp_purpose
 from core.serializers import CaptchaSerializer
 
 User = get_user_model()
@@ -45,12 +46,12 @@ class OTPVerificationSerializer(BaseIdentitySerializer, CaptchaSerializer):
         """
         identity = attrs['identity']
         code = attrs['otp']
+        purpose = get_otp_purpose(identity) # determine purpose 
 
-        otp, error = get_valid_otp(identity, code) # verify otp for given identity
+        valid, error = get_valid_otp(identity, code, purpose) # verify otp for given identity
         if error:
             raise serializers.ValidationError({"otp": error})
 
-        attrs['otp'] = otp
         return attrs
     
 class EmailConfirmationLinkSerializer(BaseIdentitySerializer, CaptchaSerializer):

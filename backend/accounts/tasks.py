@@ -1,18 +1,12 @@
 import logging
 from celery import shared_task
-from django.utils import timezone
-from accounts.models import OTP
-from datetime import timedelta
+from django.utils.timezone import now
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 
 logger = logging.getLogger(__name__)
 
 @shared_task
-def delete_expired_otps(expire_minutes=2):
-    """
-    Delete OTPs older than `expire_minutes` (default 2 minutes).
-    """
-    threshold = timezone.now() - timedelta(minutes=expire_minutes)
-    expired_qs = OTP.objects.filter(created_at__lt=threshold)
-    count = expired_qs.count()
-    expired_qs.delete()
-    logger.info(f"[Celery Beat] Deleted {count} expired OTPs older than {expire_minutes} minutes.")
+def cleanup_expired_tokens():
+    # Delete all expired tokens (including automatically related BlacklistedToken)
+    deleted_count, _ = OutstandingToken.objects.filter(expires_at__lt=now()).delete()
+    logger.info(f"Cleaned up {deleted_count} expired tokens and associated blacklisted entries.")

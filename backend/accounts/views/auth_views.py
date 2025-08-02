@@ -2,9 +2,9 @@ import logging
 
 from django.contrib.auth import get_user_model
 
-from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from drf_spectacular.utils import extend_schema
 
@@ -23,8 +23,7 @@ from accounts.serializers.auth_serializers import (
 )
 from accounts.services.auth_services import (
     handle_identity_submission,
-    handle_otp_verification,
-    handle_link_verification,
+    login_or_register_user,
     generate_tokens_for_user,
 )
 from accounts.services.cache_services import (
@@ -34,7 +33,7 @@ from accounts.services.cache_services import (
 
 from core.decorators.captcha import captcha_required
 from core.permissions import IsNotAuthenticated
-from core.throttles.throttles import CustomAnonThrottle, ResendOTPOrLinkThrottle
+from core.throttles.throttles import CustomAnonThrottle, ResendOTPOrLinkThrottle, TokenRefreshAnonThrottle
 
 User = get_user_model()
 
@@ -99,14 +98,12 @@ class OTPOrVerificationAPIView(APIView):
         Handles OTP verification.
         Verifies CAPTCHA, validates OTP, authenticates the user.
         """
-
         serializer = OTPVerificationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         identity = serializer.validated_data['identity']
-        otp = serializer.validated_data['otp']
 
         try:
-            user, action, message = handle_otp_verification(identity=identity, otp_obj=otp)
+            user, action, message = login_or_register_user(identity=identity)
             jwt_tokens = generate_tokens_for_user(user)  # create JWT tokens(login)
             logger.info(f"User authenticated: {user.id}")
             return Response({
@@ -148,7 +145,7 @@ class LinkVerificationAPIView(APIView):
         identity = serializer.validated_data['identity']
 
         try:
-            user, action, message = handle_link_verification(identity=identity)
+            user, action, message = login_or_register_user(identity=identity)
             jwt_tokens = generate_tokens_for_user(user)  # create JWT tokens(login)
             logger.info(f"User authenticated: {user.id}")
             return Response({
@@ -228,6 +225,9 @@ class PasswordLoginAPIView(APIView):
 
     @captcha_required
     def post(self, request):
+        """
+        Handles password login for users.
+        """
         serializer = PasswordLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -245,3 +245,16 @@ class PasswordLoginAPIView(APIView):
         except Exception:
             logger.error(f"Error processing logging with password for identityt {identity}", exc_info=True)
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
+        
+class CustomTokenRefreshView(TokenRefreshView):
+    """
+    Custom Token Refresh View to handle token refresh requests.
+    Inherits from SimpleJWT's TokenRefreshView.
+    """
+    throttle_classes = [TokenRefreshAnonThrottle]  # Prevent abuse by limiting request rate
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests for refreshing JWT tokens.
+        """
+        return super().post(request, *args, **kwargs)

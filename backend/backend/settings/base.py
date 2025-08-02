@@ -176,6 +176,7 @@ REST_FRAMEWORK = {
         'anon': os.getenv('THROTTLE_RATE_ANON', '200/hour'),
         'custom_action': os.getenv('THROTTLE_RATE_CUSTOM', '15/minute'),
         'resend_otp_or_link': '3/minute',
+        'token_refresh_anon': '5/minute',
     },
 
     # Exception handling

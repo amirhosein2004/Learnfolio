@@ -1,7 +1,5 @@
 import logging
 from django.contrib.auth.models import BaseUserManager
-from django.db import models
-import secrets
 
 logger = logging.getLogger(__name__)
 
@@ -51,43 +49,3 @@ class UserManager(BaseUserManager):
             password=password,
             **extra_fields
         )
-
-# ---------------------
-# Custom OTP Manager
-# --------------------- 
-class OTPManager(models.Manager):
-    """
-    Manager to generate a new OTP for a user by removing any existing OTPs.
-    Ensures only one active OTP per user regardless of purpose.
-    """
-
-    def generate_otp(self, email=None, phone_number=None, purpose=None):
-        """
-        Deletes any existing OTPs for the given user and creates a new one.
-
-        Args:
-            email (str, optional): User's email address.
-            phone_number (str, optional): User's phone number.
-            purpose (str): The OTP usage context (e.g., login, reset).
-
-        Returns:
-            tuple: (new OTP instance, True)
-        """
-        filters = {
-            "email": email,
-            "phone_number": phone_number,
-        }
-
-        # Delete all existing OTPs for the user
-        deleted_count, _ = self.filter(**filters).delete()
-        if deleted_count:
-            logger.info(f"Deleted {deleted_count} old OTPs for {email or phone_number}")
-
-        # Create and return a new OTP
-        otp = self.create(
-            code=str(secrets.randbelow(1000000)).zfill(6),
-            purpose=purpose,
-            **filters
-        )
-        logger.info(f"Generated OTP for {email or phone_number} (purpose: {purpose})")
-        return otp, True

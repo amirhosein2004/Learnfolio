@@ -1,29 +1,47 @@
-from typing import Optional, Union
-from accounts.models import OTP
+import logging
+from typing import Optional, Union, Literal
+from django.core.cache import cache
+from accounts.services.cache_services import OTPCacheService
 from accounts.utils.token_utils import verify_email_token
 from django.contrib.auth import get_user_model
 
+logger = logging.getLogger(__name__)
+
 User = get_user_model()
 
-def get_valid_otp(identity: str, code: str) -> tuple[OTP, str]: 
+def get_otp_purpose(identity: str) -> Literal["login", "register"]:
     """
-    Validate OTP for given identity and code.
-    Returns (otp, error_message) tuple.
-    If otp is valid, error_message will be None.
+    Determine purpose of OTP based on existence of user.
+    Returns 'login' if user exists, else 'register'.
     """
+    if '@' in identity:
+        return "login" if User.objects.filter(email__iexact=identity).exists() else "register"
+    return "login" if User.objects.filter(phone_number=identity).exists() else "register"
 
-    filters = {"code": code}
+def get_valid_otp(identity: str, code: str, purpose: str) -> tuple[bool, None] | tuple[None, str]:
+    """
+    Validate OTP for given identity, code, and purpose using cache.
+
+    Returns:
+        (True, None) → if OTP is valid
+        (None, error_message) → if invalid or expired
+    """
     if "@" in identity:
-        filters["email"] = identity
+        email, phone = identity, None
     else:
-        filters["phone_number"] = identity
+        email, phone = None, identity
 
-    otp = OTP.objects.filter(**filters).order_by("-created_at").first()
+    key = OTPCacheService._make_key(email=email, phone_number=phone, purpose=purpose)
+    real_code = cache.get(key)
 
-    if not otp or otp.is_expired():
-        return None, ".کد وارد شده اشتباه یا منقضی شده است. لطفاً دوباره تلاش کنید"
+    if real_code is None:
+        return None, ".کد منقضی شده است. لطفاً دوباره درخواست دهید"
+    
+    if real_code != code:
+        return None, ".کد وارد شده نادرست است"
 
-    return otp, None
+    cache.delete(key)
+    return True, None
 
 def verify_email_link(token: str) -> tuple[bool, Optional[str]]:
     """
@@ -40,6 +58,7 @@ def verify_email_link(token: str) -> tuple[bool, Optional[str]]:
     data, error = verify_email_token(token) # data contain(email, purpose)
     if error:
         return False, error
+    logger.info(f"Email link verified for {data['email']}")
     return True, None
 
 def validate_user_with_password(identity: str, password: str) -> tuple[bool, Union[str, User]]:

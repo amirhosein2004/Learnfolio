@@ -8,6 +8,7 @@ from .views.auth_views import (
     ResendOTPOrLinkAPIView,
     LinkVerificationAPIView,
     PasswordLoginAPIView,
+    CustomTokenRefreshView
 )
 
 app_name = 'accounts'
@@ -18,6 +19,5 @@ urlpatterns = [
     path('verify-link/', LinkVerificationAPIView.as_view(), name='verify_link'),
     path('resend-otp-or-link/', ResendOTPOrLinkAPIView.as_view(), name='resend_otp_or_link'),
     path('login-password/', PasswordLoginAPIView.as_view(), name='login_password'),
-
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # path refresh token
+    path('token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'), # path refresh token
 ]
