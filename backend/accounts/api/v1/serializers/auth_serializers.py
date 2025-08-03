@@ -2,7 +2,7 @@ from typing import Any
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from accounts.serializers.base_serializers import BaseIdentitySerializer
+from accounts.api.v1.serializers.base_serializers import BaseIdentitySerializer
 from accounts.services.validation_services import (
     get_valid_otp,
     validate_user_with_password,

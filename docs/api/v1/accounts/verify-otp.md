@@ -1,4 +1,4 @@
-# 📌 Endpoint: `POST /api/auth/verify-otp/`
+# 📌 Endpoint: `POST /api/v1/accounts/auth/verify-otp/`
 
 ### 🎯 کاربرد:
 
@@ -32,7 +32,7 @@
 
 ### ➤ Method: `POST`
 
-### ➤ URL: `/api/auth/verify-otp/`
+### ➤ URL: `/api/v1/accounts/auth/verify-otp/`
 
 ---
 

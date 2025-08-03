@@ -8,8 +8,11 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls), # admin 
-    path('api/auth/', include('accounts.urls')), # accounts app 
+    # Admin
+    path('admin/', admin.site.urls),
+
+    # Accounts app URLs
+    path('api/v1/accounts/', include('accounts.api.v1.urls')),
 ]
 
 # active in dev 

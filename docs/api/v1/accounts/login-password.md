@@ -1,4 +1,4 @@
-# 📌 Endpoint: `POST /api/auth/login/password/`
+# 📌 Endpoint: `POST /api/v1/accounts/auth/login-password/`
 
 ### 🎯 کاربرد:
 
@@ -32,7 +32,7 @@
 
 ### ➤ Method: `POST`
 
-### ➤ URL: `/api/auth/login/password/`
+### ➤ URL: `/api/v1/accounts/auth/login-password/`
 
 ---
 

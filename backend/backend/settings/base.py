@@ -166,6 +166,12 @@ TURNSTILE_SECRET_KEY = os.getenv("TURNSTILE_SECRET_KEY")
 
 # Django REST Framework settings
 REST_FRAMEWORK = {
+    # Versioning configuration
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ('v1',),
+    'VERSION_PARAM': 'version',
+    
     # Throttling
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.UserRateThrottle',
@@ -193,12 +199,12 @@ REST_FRAMEWORK = {
 
 # Simple JWT settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),   # Short lifetime for increased security
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15), # access token lifetime
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7), # refresh token lifetime
+    'ROTATE_REFRESH_TOKENS': True, # rotate refresh token
+    'BLACKLIST_AFTER_ROTATION': True, # blacklist refresh token after rotation
+    'AUTH_HEADER_TYPES': ('Bearer',), # auth header types
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',), # auth token classes
 }
 
 SPECTACULAR_SETTINGS = {
@@ -207,6 +213,6 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': True,
     'COMPONENT_SPLIT_REQUEST': True,
-    'ENABLE_EXAMPLES': True,  # active examples
-    'EXAMPLES_ENABLED': True, 
+    'ENABLE_EXAMPLES': True, # active examples 
+    'EXAMPLES_ENABLED': True, # active examples 
 }

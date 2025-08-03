@@ -1,4 +1,4 @@
-# 📌 Endpoint: `POST /api/auth/submit-identity/`
+# 📌 Endpoint: `POST /api/v1/accounts/auth/submit-identity/`
 
 ### 🎯 کاربرد:
 
@@ -33,7 +33,7 @@
 
 ### ➤ Method: `POST`
 
-### ➤ URL: `/api/auth/submit-identity/`
+### ➤ URL: `/api/v1/accounts/auth/submit-identity/`
 
 ---
 
@@ -90,7 +90,7 @@
 ```json
 {
   "detail": "کد تایید به شماره موبایل شما ارسال شد.",
-  "next_url": "/api/auth/verify-otp/",
+  "next_url": "/api/v1/accounts/auth/verify-otp/",
   "purpose": "register"
 }
 ```

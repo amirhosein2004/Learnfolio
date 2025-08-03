@@ -8,14 +8,14 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from drf_spectacular.utils import extend_schema
 
-from accounts.schema_docs import (
+from accounts.schema_docs.v1 import (
     identity_submit_schema,
     otp_verification_schema,
     link_verification_schema,
     resend_otp_or_link_schema,
     password_login_schema,
 )
-from accounts.serializers.auth_serializers import (
+from accounts.api.v1.serializers.auth_serializers import (
     IdentitySerializer,
     OTPVerificationSerializer,
     EmailConfirmationLinkSerializer,
@@ -245,16 +245,11 @@ class PasswordLoginAPIView(APIView):
         except Exception:
             logger.error(f"Error processing logging with password for identityt {identity}", exc_info=True)
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
-        
+
+@extend_schema(summary="دریافت توکن دسترسی و رفرش توکن جدید" ,tags=['auth'])        
 class CustomTokenRefreshView(TokenRefreshView):
     """
     Custom Token Refresh View to handle token refresh requests.
     Inherits from SimpleJWT's TokenRefreshView.
     """
     throttle_classes = [TokenRefreshAnonThrottle]  # Prevent abuse by limiting request rate
-
-    def post(self, request, *args, **kwargs):
-        """
-        Handles POST requests for refreshing JWT tokens.
-        """
-        return super().post(request, *args, **kwargs)

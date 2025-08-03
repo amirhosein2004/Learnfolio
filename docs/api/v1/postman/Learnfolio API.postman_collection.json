@@ -30,7 +30,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/auth/submit-identity/",
+							"raw": "http://localhost:8000/api/v1/accounts/auth/submit-identity/",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -38,6 +38,8 @@
 							"port": "8000",
 							"path": [
 								"api",
+								"v1",
+								"accounts",
 								"auth",
 								"submit-identity",
 								""
@@ -61,7 +63,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/auth/verify-otp/",
+							"raw": "http://localhost:8000/api/v1/accounts/auth/verify-otp/",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -69,6 +71,8 @@
 							"port": "8000",
 							"path": [
 								"api",
+								"v1",
+								"accounts",
 								"auth",
 								"verify-otp",
 								""
@@ -98,7 +102,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/auth/resend-otp-or-link/",
+							"raw": "http://localhost:8000/api/v1/accounts/auth/resend-otp-or-link/",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -106,6 +110,8 @@
 							"port": "8000",
 							"path": [
 								"api",
+								"v1",
+								"accounts",
 								"auth",
 								"resend-otp-or-link",
 								""
@@ -129,7 +135,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/auth/verify-link/",
+							"raw": "http://localhost:8000/api/v1/accounts/auth/verify-link/",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -137,6 +143,8 @@
 							"port": "8000",
 							"path": [
 								"api",
+								"v1",
+								"accounts",
 								"auth",
 								"verify-link",
 								""
@@ -167,7 +175,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/auth/login-password/",
+							"raw": "http://localhost:8000/api/v1/accounts/auth/login-password/",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -175,6 +183,8 @@
 							"port": "8000",
 							"path": [
 								"api",
+								"v1",
+								"accounts",
 								"auth",
 								"login-password",
 								""
@@ -190,7 +200,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNjMyODM2LCJpYXQiOjE3NTM2MzE5MzYsImp0aSI6ImIxOGVhNGE0NzkwZTQ2YjFiNzYwZmJmZjUxMzM0YzIyIiwidXNlcl9pZCI6NH0.mRL9db7vZheVZ8pKtMJaJDjnBjoENk2qSu5raNLQ8Dw\"\r\n}",
+							"raw": "{\r\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1NDgxOTk2NSwiaWF0IjoxNzU0MjE1MTY1LCJqdGkiOiIwZDY4NDRhYmE5MjU0YWNkODExNDVhYWNjNTI3Yzc2ZCIsInVzZXJfaWQiOjR9.z11jECIxyOje_AYHD6UFQTxncwpEkJcOEehWzljF3zk\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -198,15 +208,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000//api/auth/token/refresh/",
+							"raw": "http://localhost:8000/api/v1/accounts/auth/token/refresh/",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8000",
 							"path": [
-								"",
 								"api",
+								"v1",
+								"accounts",
 								"auth",
 								"token",
 								"refresh",

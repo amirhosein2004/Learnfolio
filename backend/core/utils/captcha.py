@@ -11,9 +11,11 @@ def verify_turnstile_token(token: str = None, remoteip=None) -> bool:
     Returns False if CAPTCHA is enabled and token is missing or invalid.
     """
     if not settings.TURNSTILE_ENABLED:
+        logger.debug("CAPTCHA verification is disabled in settings")
         return True  # CAPTCHA is disabled globally
 
     if not token:
+        logger.warning(f"CAPTCHA verification failed: No token provided for IP: {remoteip}")
         return False  # CAPTCHA is enabled, but no token sent
 
     data = {

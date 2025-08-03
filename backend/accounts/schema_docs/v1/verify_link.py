@@ -1,6 +1,6 @@
 from drf_spectacular.utils import OpenApiResponse, OpenApiExample
-from accounts.serializers.auth_serializers import EmailConfirmationLinkSerializer
-from accounts.schema_docs.common_schemas import STANDARD_ERROR_RESPONSES
+from accounts.api.v1.serializers.auth_serializers import EmailConfirmationLinkSerializer
+from .common_schemas import STANDARD_ERROR_RESPONSES
 
 link_verification_schema = {
     "request": EmailConfirmationLinkSerializer,

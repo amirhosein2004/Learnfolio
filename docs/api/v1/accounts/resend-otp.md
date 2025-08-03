@@ -1,4 +1,4 @@
-# 📌 Endpoint: `POST /api/auth/resend-otp-or-link/`
+# 📌 Endpoint: `POST /api/v1/accounts/auth/resend-otp-or-link/`
 
 ### 🎯 کاربرد:
 
@@ -36,7 +36,7 @@
 
 ### ➤ Method: `POST`
 
-### ➤ URL: `/api/auth/resend-otp-or-link/`
+### ➤ URL: `/api/v1/accounts/auth/resend-otp-or-link/`
 
 ---
 
@@ -80,7 +80,7 @@
 {
   "detail": "کد ورود به ایمیل/شماره شما ارسال شد",
   "purpose": "login",
-  "next_url": "/api/auth/verify-otp/"
+  "next_url": "/api/v1/accounts/auth/verify-otp/"
 }
 ```
 
@@ -90,7 +90,7 @@
 {
   "detail": "لینک ثبت‌نام به ایمیل شما ارسال شد",
   "purpose": "register",
-  "next_url": "/api/auth/verify-link/"
+  "next_url": "/api/v1/accounts/auth/verify-link/"
 }
 ```
 
@@ -100,7 +100,7 @@
 {
   "detail": "کد ثبت‌نام برای شماره شما ارسال شد",
   "purpose": "register",
-  "next_url": "/api/auth/verify-otp/"
+  "next_url": "/api/v1/accounts/auth/verify-otp/"
 }
 ```
 
