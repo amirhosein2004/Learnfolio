@@ -1,58 +1,58 @@
 from drf_spectacular.utils import OpenApiResponse, OpenApiExample
 from accounts.api.v1.serializers.auth_serializers import IdentitySerializer
-from .common_schemas import STANDARD_ERROR_RESPONSES
+from ..common_schemas import STANDARD_ERROR_RESPONSES
 
-identity_submit_schema = {
+resend_otp_or_link_schema = {
     "request": IdentitySerializer,
     "responses": {
         200: OpenApiResponse(
-            description=".کد یا لینک تأیید با موفقیت ارسال شد",
+            description=".کد یا لینک تأیید با موفقیت مجدداً ارسال شد",
             response={
-                "message": "پیام موفقیت‌آمیز به فارسی",
+                "detail": "پیام موفقیت‌آمیز به فارسی",
                 "purpose": "login | register",
-                "next_step": "آدرس مرحله بعد"
+                "next_url": "آدرس مرحله بعد"
             },
             examples=[
                 OpenApiExample(
-                    name="ورود با ایمیل",
+                    name="ارسال مجدد کد ورود با ایمیل",
                     value={
-                        "message": ".کد ورود به ایمیل شما ارسال شد",
+                        "detail": ".کد ورود به ایمیل شما ارسال شد",
                         "purpose": "login",
-                        "next_step": "/api/v1/accounts/auth/verify-otp/"
+                        "next_url": "/api/v1/accounts/auth/verify-otp/"
                     },
                     response_only=True,
                 ),
                 OpenApiExample(
-                    name="ورود با شماره موبایل",
+                    name="ارسال مجدد کد ورود با موبایل",
                     value={
-                        "message": ".کد ورود برای شماره شما ارسال شد",
+                        "detail": ".کد ورود برای شماره شما ارسال شد",
                         "purpose": "login",
-                        "next_step": "/api/v1/accounts/auth/verify-otp/"
+                        "next_url": "/api/v1/accounts/auth/verify-otp/"
                     },
                     response_only=True,
                 ),
                 OpenApiExample(
-                    name="ثبت‌نام با ایمیل",
+                    name="ارسال مجدد لینک ثبت‌نام با ایمیل",
                     value={
-                        "message": ".لینک ثبت‌نام به ایمیل شما ارسال شد",
+                        "detail": ".لینک ثبت‌نام به ایمیل شما ارسال شد",
                         "purpose": "register",
-                        "next_step": "/api/v1/accounts/auth/verify-link/"
+                        "next_url": "/api/v1/accounts/auth/verify-link/"
                     },
                     response_only=True,
                 ),
                 OpenApiExample(
-                    name="ثبت‌نام با شماره موبایل",
+                    name="ارسال مجدد کد ثبت‌نام با موبایل",
                     value={
-                        "message": ".کد ثبت‌نام برای شماره شما ارسال شد",
+                        "detail": ".کد ثبت‌نام برای شماره شما ارسال شد",
                         "purpose": "register",
-                        "next_step": "/api/v1/accounts/auth/verify-otp/"
+                        "next_url": "/api/v1/accounts/auth/verify-otp/"
                     },
                     response_only=True,
                 ),
             ]
         ),
         400: OpenApiResponse(
-            description=".خطاهای اعتبارسنجی کپچا یا شناسه (ایمیل یا شماره موبایل)",
+            description=".خطاهای اعتبارسنجی کپچا یا شناسه",
             response={
                 "identity": [".ورودی نامعتبر است. لطفاً یک ایمیل یا شماره تلفن معتبر وارد کنید"],
                 "cf_turnstile_response": [".اعتبارسنجی کپچا ناموفق بود"]
@@ -85,15 +85,21 @@ identity_submit_schema = {
                 ),
             ]
         ),
-        **STANDARD_ERROR_RESPONSES # Include standard error responses
+        403: STANDARD_ERROR_RESPONSES[403],
+        429: STANDARD_ERROR_RESPONSES[429],
+        500: STANDARD_ERROR_RESPONSES[500],
     },
-    "summary": "ارسال شناسه (ایمیل یا موبایل) و دریافت کد تأیید",
+    "summary": "ارسال مجدد کد یا لینک تأیید",
     "description": (
-        "This API receives a user identifier (email or phone number) and, if valid, sends a verification code.\n\n" 
+        "This API resends verification OTP or confirmation link to the given identity.\n\n" 
         "- CAPTCHA is required ✅ (`cf_turnstile_response` field)\n"
-        "- The identifier can be either an email or a phone number. Persian/Arabic digits are also supported 🔄\n"
+        "- The identifier can be either an email or a phone number 📧📱\n"
         "- Logged-in users are not allowed to use this service 🚫\n"
-        "- Request rate limiting (Throttle) is enabled 2 min⏱️"
+        "- Resend cooldown: 2 minutes ⏱️\n"
+        "- Automatically detects user status (existing/new) and sends appropriate verification:\n"
+        "  • Existing users: Login OTP (email or phone)\n"
+        "  • New users: Registration link (email) or OTP (phone)\n"
+        "- Request rate limiting (Throttle) is enabled 🛡️"
     ),
     "tags": ["auth"],
     "auth": [],  # No authentication required for this endpoint

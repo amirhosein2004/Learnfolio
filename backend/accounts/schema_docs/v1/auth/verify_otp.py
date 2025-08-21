@@ -1,9 +1,9 @@
 from drf_spectacular.utils import OpenApiResponse, OpenApiExample
-from accounts.api.v1.serializers.auth_serializers import OTPVerificationSerializer
-from .common_schemas import STANDARD_ERROR_RESPONSES
+from accounts.api.v1.serializers.auth_serializers import AuthenticateOTPVerificationSerializer
+from ..common_schemas import STANDARD_ERROR_RESPONSES
 
 otp_verification_schema = {
-    "request": OTPVerificationSerializer,
+    "request": AuthenticateOTPVerificationSerializer,
     "responses": {
         200: OpenApiResponse(
             description=".احراز هویت موفقیت‌آمیز انجام شد",
@@ -50,23 +50,48 @@ otp_verification_schema = {
                     response_only=True,
                 ),
                 OpenApiExample(
+                    name="شناسه کاربری خالی",
+                    value={"identity": [".لطفاً ایمیل یا شماره تلفن را وارد کنید"]},
+                    response_only=True,
+                ),
+                OpenApiExample(
                     name="ایمیل نامعتبر",
                     value={"identity": [".وارد کنید example@example.com ایمیل نامعتبر است. لطفاً یک ایمیل معتبر مانند"]},
                     response_only=True,
                 ),
                 OpenApiExample(
-                    name="کد تایید نامعتبر",
+                    name="شماره موبایل نامعتبر",
+                    value={"identity": [".ورودی نامعتبر است. لطفاً یک ایمیل یا شماره تلفن معتبر وارد کنید"]},
+                    response_only=True,
+                ),
+                OpenApiExample(
+                    name="عدم ارسال کد",
+                    value={"otp": [".کد تایید الزامی است"]},
+                    response_only=True,
+                ), 
+                OpenApiExample(
+                    name="کد تایید خالی",
+                    value={"otp": [".کد تایید نمی‌تواند خالی باشد"]},
+                    response_only=True,
+                ),
+                OpenApiExample(
+                    name="طول کد تایید",
                     value={"otp": [".کد تایید باید 6 رقم باشد"]},
                     response_only=True,
                 ),
                 OpenApiExample(
-                    name="کد تأیید غیر عددی",
+                    name="کد تایید غیر عددی",
                     value={"otp": [".کد تأیید باید فقط شامل ارقام باشد"]},
                     response_only=True,
                 ),
                 OpenApiExample(
                     name="کد تایید منقضی شده",
-                    value={"otp": [".کد وارد شده اشتباه یا منقضی شده است. لطفاً دوباره تلاش کنید"]},
+                    value={"otp": [".کد منقضی شده است. لطفاً دوباره درخواست دهید"]},
+                    response_only=True,
+                ),
+                OpenApiExample(
+                    name="کد نادرست",
+                    value={"otp": [".کد وارد شده نادرست است"]},
                     response_only=True,
                 ),
                 OpenApiExample(
@@ -76,7 +101,9 @@ otp_verification_schema = {
                 ),
             ]
         ),
-        **STANDARD_ERROR_RESPONSES # Include standard error responses
+        403: STANDARD_ERROR_RESPONSES[403],
+        429: STANDARD_ERROR_RESPONSES[429],
+        500: STANDARD_ERROR_RESPONSES[500],
     },
     "summary": "تایید کد OTP و احراز هویت کاربر",
         "description": (

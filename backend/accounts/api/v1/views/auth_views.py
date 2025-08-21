@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 from drf_spectacular.utils import extend_schema
 
@@ -14,11 +16,12 @@ from accounts.schema_docs.v1 import (
     link_verification_schema,
     resend_otp_or_link_schema,
     password_login_schema,
+    logout_schema
 )
 from accounts.api.v1.serializers.auth_serializers import (
     IdentitySerializer,
-    OTPVerificationSerializer,
-    EmailConfirmationLinkSerializer,
+    AuthenticateOTPVerificationSerializer,
+    RegisterConfirmationLinkSerializer,
     PasswordLoginSerializer,
 )
 from accounts.services.auth_services import (
@@ -32,8 +35,12 @@ from accounts.services.cache_services import (
 )
 
 from core.decorators.captcha import captcha_required
-from core.permissions import IsNotAuthenticated
-from core.throttles.throttles import CustomAnonThrottle, ResendOTPOrLinkThrottle, TokenRefreshAnonThrottle
+from core.permissions import UserIsNotAuthenticated, UserIsAuthenticated
+from core.throttles.throttles import (
+    CustomAnonThrottle,
+    ResendOTPOrLinkThrottle,
+    TokenRefreshAnonThrottle
+)
 
 User = get_user_model()
 
@@ -53,15 +60,11 @@ class IdentitySubmissionAPIView(APIView):
     restrict access authenticated users.
     """
     authentication_classes = []  # No authentication required
-    permission_classes = [IsNotAuthenticated] # Prevent authenticated users
+    permission_classes = [UserIsNotAuthenticated] # Prevent authenticated users
     throttle_classes = [CustomAnonThrottle] # Prevent abuse by limiting request rate
 
     @captcha_required
     def post(self, request):
-        """
-        POST method to validate submitted identity (email or phone)
-        and trigger OTP or confirmation link sending.
-        """
         serializer = IdentitySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         identity = serializer.validated_data['identity']
@@ -89,16 +92,12 @@ class OTPOrVerificationAPIView(APIView):
     restrict access authenticated users.
     """
     authentication_classes = []  # No authentication required
-    permission_classes = [IsNotAuthenticated]
+    permission_classes = [UserIsNotAuthenticated]
     throttle_classes = [CustomAnonThrottle]  # Prevent abuse by limiting request rate
 
     @captcha_required
     def post(self, request):
-        """
-        Handles OTP verification.
-        Verifies CAPTCHA, validates OTP, authenticates the user.
-        """
-        serializer = OTPVerificationSerializer(data=request.data)
+        serializer = AuthenticateOTPVerificationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         identity = serializer.validated_data['identity']
 
@@ -131,16 +130,12 @@ class LinkVerificationAPIView(APIView):
     restrict access authenticated users.
     """
     authentication_classes = []  # No authentication required
-    permission_classes = [IsNotAuthenticated]
+    permission_classes = [UserIsNotAuthenticated]
     throttle_classes = [CustomAnonThrottle]  # Prevent abuse by limiting request rate
     
     @captcha_required
     def post(self, request):
-        """
-        Handles confirm link verification.
-        Verifies CAPTCHA, validates token, authenticates the user.
-        """
-        serializer = EmailConfirmationLinkSerializer(data=request.data)
+        serializer = RegisterConfirmationLinkSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         identity = serializer.validated_data['identity']
 
@@ -173,16 +168,11 @@ class ResendOTPOrLinkAPIView(APIView):
     restrict access authenticated users.
     """
     authentication_classes = []  # No authentication required
-    permission_classes = [IsNotAuthenticated]
+    permission_classes = [UserIsNotAuthenticated]
     throttle_classes = [ResendOTPOrLinkThrottle]
 
     @captcha_required
     def post(self, request):
-        """
-        Handles resend requests for OTP or confirmation link.
-
-        if can send: Resends OTP or link using `handle_identity_submission`
-        """
         serializer = IdentitySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         identity = serializer.validated_data['identity']
@@ -220,14 +210,11 @@ class PasswordLoginAPIView(APIView):
     restrict access authenticated users.
     """
     authentication_classes = []  # No authentication required
-    permission_classes = [IsNotAuthenticated]
+    permission_classes = [UserIsNotAuthenticated]
     throttle_classes = [CustomAnonThrottle]
 
     @captcha_required
     def post(self, request):
-        """
-        Handles password login for users.
-        """
         serializer = PasswordLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -245,6 +232,30 @@ class PasswordLoginAPIView(APIView):
         except Exception:
             logger.error(f"Error processing logging with password for identityt {identity}", exc_info=True)
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
+        
+@extend_schema(**logout_schema)
+class LogoutAPIView(APIView):
+    """
+    Handles user logout by invalidating the refresh token.
+    """
+    permission_classes = [UserIsAuthenticated]  # Only authenticated users can access
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh', None)
+        if not refresh_token:
+            return Response({'detail': '.لطفا توکن رفرش را ارسال کنید'}, status=400)
+        
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # Blacklist the refresh token
+            logger.info(f"User {request.user.id} logged out successfully")
+            return Response({'detail': '.با موفقیت خارج شدید'}, status=205)
+        except TokenError:
+            logger.warning(f"Invalid or expired token for user {request.user.id}")
+            return Response({'detail': '.توکن نامعتبر یا منقضی است'}, status=400)
+        except Exception:
+            logger.error(f"Error during logout for user {request.user.id}", exc_info=True)
+            return Response({'detail': '.خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
 
 @extend_schema(summary="دریافت توکن دسترسی و رفرش توکن جدید" ,tags=['auth'])        
 class CustomTokenRefreshView(TokenRefreshView):

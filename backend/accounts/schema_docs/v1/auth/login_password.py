@@ -1,6 +1,6 @@
 from drf_spectacular.utils import OpenApiResponse, OpenApiExample
 from accounts.api.v1.serializers.auth_serializers import PasswordLoginSerializer
-from .common_schemas import STANDARD_ERROR_RESPONSES
+from ..common_schemas import STANDARD_ERROR_RESPONSES
 
 password_login_schema = {
     "request": PasswordLoginSerializer,
@@ -94,7 +94,9 @@ password_login_schema = {
                 ),
             ]
         ),
-        **STANDARD_ERROR_RESPONSES # Include standard error responses
+        403: STANDARD_ERROR_RESPONSES[403],
+        429: STANDARD_ERROR_RESPONSES[429],
+        500: STANDARD_ERROR_RESPONSES[500],
     },
     "summary": "ورود با رمز عبور",
     "description": (

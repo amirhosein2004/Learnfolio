@@ -4,19 +4,25 @@ from django.core.cache import cache
 from accounts.services.cache_services import OTPCacheService
 from accounts.utils.token_utils import verify_email_token
 from django.contrib.auth import get_user_model
+import jwt
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
-def get_otp_purpose(identity: str) -> Literal["login", "register"]:
+def get_identity_purpose(identity: str, context: str = None) -> Literal["login", "register", "reset_password"]:
     """
-    Determine purpose of OTP based on existence of user.
-    Returns 'login' if user exists, else 'register'.
+    Determine purpose based on existence of user.
+    Returns 'login' if user exists, else 'register' or 'reset_password' based on context.
     """
+    if context == "reset_password":
+        return "reset_password"
+    
     if '@' in identity:
         return "login" if User.objects.filter(email__iexact=identity).exists() else "register"
     return "login" if User.objects.filter(phone_number=identity).exists() else "register"
+
 
 def get_valid_otp(identity: str, code: str, purpose: str) -> tuple[bool, None] | tuple[None, str]:
     """
@@ -82,3 +88,19 @@ def validate_user_with_password(identity: str, password: str) -> tuple[bool, Uni
         return False, ".رمز عبور اشتباه است یا هنوز تنظیم نشده است"
 
     return True, user
+
+def validate_reset_password_token(token: str) -> dict:
+    """
+    validate reset password token
+    """
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+        if payload.get("type") != "reset_password":
+            raise jwt.InvalidTokenError("Invalid token type")
+        return payload
+    except jwt.ExpiredSignatureError:
+        logger.info(f"Reset password token expired for {token} by identity {payload.get('identity')}")
+        raise ValueError("توکن منقضی شده است")
+    except jwt.InvalidTokenError:
+        logger.info(f"Invalid reset password token for {token} by identity {payload.get('identity')}")
+        raise ValueError("توکن معتبر نیست")

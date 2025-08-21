@@ -2,6 +2,17 @@ from drf_spectacular.utils import OpenApiResponse, OpenApiExample
 
 # پاسخ‌های خطای استاندارد
 STANDARD_ERROR_RESPONSES = {
+    401: OpenApiResponse(
+        description=".کاربر احراز هویت نشده است",
+        response={"detail": ".ابتدا وارد شوید"},
+        examples=[
+            OpenApiExample(
+                name="کاربر احراز هویت نشده",
+                value={"detail": ".ابتدا وارد شوید"},
+                response_only=True,
+            )
+        ]
+    ),
     403: OpenApiResponse(
         description=".کاربر وارد شده است و نمی‌تواند از این سرویس استفاده کند",
         response={"detail": ".شما قبلاً وارد شده‌اید"},

@@ -1,9 +1,9 @@
 from drf_spectacular.utils import OpenApiResponse, OpenApiExample
-from accounts.api.v1.serializers.auth_serializers import EmailConfirmationLinkSerializer
-from .common_schemas import STANDARD_ERROR_RESPONSES
+from accounts.api.v1.serializers.auth_serializers import RegisterConfirmationLinkSerializer
+from ..common_schemas import STANDARD_ERROR_RESPONSES
 
 link_verification_schema = {
-    "request": EmailConfirmationLinkSerializer,
+    "request": RegisterConfirmationLinkSerializer,
     "responses": {
         200: OpenApiResponse(
             description=".لینک تأیید با موفقیت احراز هویت شد",
@@ -35,6 +35,16 @@ link_verification_schema = {
             },
             examples=[
                 OpenApiExample(
+                    name="عدم ارسال شناسه",
+                    value={"identity": [".وارد کردن ایمیل یا شماره تلفن الزامی است"]},
+                    response_only=True,
+                ),
+                OpenApiExample(
+                    name="شناسه کاربری خالی",
+                    value={"identity": [".لطفاً ایمیل یا شماره تلفن را وارد کنید"]},
+                    response_only=True,
+                ),
+                OpenApiExample(
                     name="ایمیل نامعتبر",
                     value={"identity": [".برای تایید لینک ایمیل، لطفاً یک آدرس ایمیل معتبر وارد کنید"]},
                     response_only=True,
@@ -42,6 +52,16 @@ link_verification_schema = {
                 OpenApiExample(
                     name="ایمیل تکراری",
                     value={"identity": [".این ایمیل قبلاً ثبت شده است"]},
+                    response_only=True,
+                ),
+                OpenApiExample(
+                    name="عدم ارسال توکن لینک",
+                    value={"token": [".توکن تایید لینک الزامی است"]},
+                    response_only=True,
+                ),
+                OpenApiExample(
+                    name="توکن تایید لینک خالی",
+                    value={"token": [".توکن تایید لینک نمی‌تواند خالی باشد"]},
                     response_only=True,
                 ),
                 OpenApiExample(
@@ -61,7 +81,9 @@ link_verification_schema = {
                 ),
             ]
         ),
-        **STANDARD_ERROR_RESPONSES # Include standard error responses
+        403: STANDARD_ERROR_RESPONSES[403],
+        429: STANDARD_ERROR_RESPONSES[429],
+        500: STANDARD_ERROR_RESPONSES[500],
     },
     "summary": "تأیید لینک ثبت‌نام از طریق ایمیل",
     "description": (

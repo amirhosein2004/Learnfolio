@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.services.cache_services import OTPCacheService
-from accounts.services.validation_services import get_otp_purpose
+from accounts.services.validation_services import get_identity_purpose
 from accounts.utils.token_utils import generate_email_token
 from core.tasks import send_email_task, send_sms_task
 
@@ -26,7 +26,7 @@ def handle_identity_submission(identity: str) -> tuple[str, str, str]:
     Returns:
         tuple: (Result message,purpose, Next step URL)
     """
-    purpose = get_otp_purpose(identity)
+    purpose = get_identity_purpose(identity)
 
     if '@' in identity:
         if purpose == "register":
@@ -49,12 +49,8 @@ def handle_identity_submission(identity: str) -> tuple[str, str, str]:
 def login_or_register_user(identity: str) -> tuple[User, str, str]:
     """
     Log in or register a user based on their identity (email or phone number).
-    Args:
-        identity (str): The user's email or phone number.
-    Returns:
-        tuple: (User instance, action performed, success message)
     """
-    purpose = get_otp_purpose(identity)
+    purpose = get_identity_purpose(identity)
     is_email = '@' in identity
     
     if purpose == "register":
@@ -78,12 +74,6 @@ def login_or_register_user(identity: str) -> tuple[User, str, str]:
 def generate_tokens_for_user(user: Any) -> dict[str, str]:
     """
     Generate JWT refresh and access tokens for a given user.
-
-    Args:
-        user (User): The user instance for whom to generate tokens.
-
-    Returns:
-        dict: A dictionary containing 'refresh' and 'access' tokens as strings.
     """
     refresh = RefreshToken.for_user(user)
     logger.info(f"Tokens generated for user: {user.id}")
@@ -126,7 +116,7 @@ def send_auth_email(email: str, purpose: str) -> str:
     Returns:
         str: The OTP code or confirmation link.
     """
-    if purpose == "register":
+    if purpose == "register" or purpose == "reset_password":
         token = generate_email_token(email, purpose)
         link = f"http://localhost:8000/api/auth/verify-otp-or-link/?email={email}&token={token}&purpose={purpose}"
         subject = "لینک تایید ایمیل"

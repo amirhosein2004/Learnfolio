@@ -12,3 +12,4 @@
 - [env_vars.md](./env_vars.md): متغیرهای محیطی
 - [setup.md](./setup.md): راهنمای راه‌اندازی پروژه
 - [frontend-guide.md](./frontend-guide.md): راهنمای فرانت‌اند
+- [logging.md](./logging.md): سیستم لاگ‌گیری

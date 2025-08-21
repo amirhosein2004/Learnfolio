@@ -2,42 +2,30 @@ from typing import Any
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from accounts.api.v1.serializers.base_serializers import BaseIdentitySerializer
+from accounts.api.v1.serializers.base_serializers import (
+    BaseIdentitySerializer,
+    BaseEmailConfirmationLinkSerializer,
+    BaseOTPVerificationSerializer
+)
 from accounts.services.validation_services import (
     get_valid_otp,
     validate_user_with_password,
-    verify_email_link,
 )
-from accounts.services.validation_services import get_otp_purpose
-from core.serializers import CaptchaSerializer
+from accounts.services.validation_services import get_identity_purpose
 
 User = get_user_model()
 
-class IdentitySerializer(BaseIdentitySerializer, CaptchaSerializer):
+class IdentitySerializer(BaseIdentitySerializer):
     """
     Serializer to validate a user's identity (email or phone number).
     """
     pass
 
-class OTPVerificationSerializer(BaseIdentitySerializer, CaptchaSerializer):
+class AuthenticateOTPVerificationSerializer(BaseOTPVerificationSerializer):
     """
     Serializer for verifying an OTP code and identity.
     Requires identity and code.
     """
-    otp = serializers.CharField(
-        required=True, allow_blank=False, min_length=6, max_length=6,
-        error_messages={
-            'blank': ".کد تایید نمی‌تواند خالی باشد",
-            'required': ".کد تایید الزامی است",
-            'min_length': ".کد تایید باید 6 رقم باشد",
-            'max_length': ".کد تایید باید 6 رقم باشد"
-        }
-    )
-    
-    def validate_otp(self, value: str) -> str:
-        if not value.isdigit():
-            raise serializers.ValidationError(".کد تأیید باید فقط شامل ارقام باشد")
-        return value
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         """
@@ -46,7 +34,7 @@ class OTPVerificationSerializer(BaseIdentitySerializer, CaptchaSerializer):
         """
         identity = attrs['identity']
         code = attrs['otp']
-        purpose = get_otp_purpose(identity) # determine purpose 
+        purpose = get_identity_purpose(identity) # determine purpose 
 
         valid, error = get_valid_otp(identity, code, purpose) # verify otp for given identity
         if error:
@@ -54,41 +42,18 @@ class OTPVerificationSerializer(BaseIdentitySerializer, CaptchaSerializer):
 
         return attrs
     
-class EmailConfirmationLinkSerializer(BaseIdentitySerializer, CaptchaSerializer):
+class RegisterConfirmationLinkSerializer(BaseEmailConfirmationLinkSerializer):
     """
-    Serializer for verifying an email confirmation link.
+    Serializer for verifying a registration confirmation link.
     Requires identity and token.
     """
-    token = serializers.CharField(
-        required=True, allow_blank=False,
-        error_messages={
-            'required': ".توکن تایید لینک الزامی است",
-            'blank': ".توکن تایید لینک نمی‌تواند خالی باشد"
-        }
-    )
-
     def validate_identity(self, value: str) -> str:
-        if '@' not in value:
-            raise serializers.ValidationError(".برای تایید لینک ایمیل، لطفاً یک آدرس ایمیل معتبر وارد کنید")
         if User.objects.filter(email__iexact=value).exists():
+            # TODO: اینجا هم بررسی کن که این پیام را به کاربر بدهم ایراد امنیتی دارد یا نه
             raise serializers.ValidationError(".این ایمیل قبلاً ثبت شده است")
         return super().validate_identity(value)
 
-    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
-        """
-        Validate the email confirmation link.
-        Checks if the token is valid and not expired.
-        """
-        token = attrs['token']
-
-        valid, error = verify_email_link(token)
-
-        if error:
-            raise serializers.ValidationError({"token": error})
-
-        return attrs
-
-class PasswordLoginSerializer(BaseIdentitySerializer, CaptchaSerializer):
+class PasswordLoginSerializer(BaseIdentitySerializer):
     """
     Serializer for logging in with identity (email or phone) and password.
     """

@@ -36,35 +36,35 @@ class OTPCacheService:
         logger.info(f"Generated OTP for {email or phone_number} (purpose: {purpose})")
         return otp
 
-def get_resend_cache_key(identity: str) -> str:
+def get_resend_cache_key(identity: str, purpose: str) -> str:
     """
-    Generate a cache key for resend cooldown tracking based on the user's identity
-    (email or phone number).
+    Generate a cache key for resend cooldown tracking based on the user's identity and purpose.
     """
-    return f"resend_{identity}"
+    return f"resend_{identity}_{purpose}"
 
-def can_resend(identity: str) -> tuple[bool, int]:
+def can_resend(identity: str, purpose: str) -> tuple[bool, int]:
     """
-    Check if a resend (OTP or confirmation link) is allowed for the given identity.
+    Check if a resend (OTP or confirmation link) is allowed for the given identity and purpose.
     
     Returns:
         (bool, int): 
             - True if resend is allowed, False otherwise.
             - Seconds remaining until next allowed resend.
     """
-    cache_key = get_resend_cache_key(identity)
+    cache_key = get_resend_cache_key(identity, purpose)
     seconds_left = cache.ttl(cache_key)
     if seconds_left and seconds_left > 0:
         return False, seconds_left
     return True, 0
 
-def set_resend_cooldown(identity: str, timeout: int = 300) -> None:
+def set_resend_cooldown(identity: str, purpose: str, timeout: int = 300) -> None:
     """
     Set a cooldown period for resending OTP or confirmation link.
     
     Args:
         identity (str): The target identifier (email or phone).
+        purpose (str): The purpose of the resend (e.g., "login", "register", "reset_password").
         timeout (int): Cooldown time in seconds.
     """
-    cache_key = get_resend_cache_key(identity)
+    cache_key = get_resend_cache_key(identity, purpose)
     cache.set(cache_key, True, timeout=timeout)

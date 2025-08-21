@@ -64,3 +64,13 @@ class IdentityValidationMixin:
         Example: 09123456789
         """
         return re.match(r'^09\d{9}$', phone)
+
+class CaptchaSerializerMixin:
+    """
+    Mixin for serializers that require captcha validation.
+    """
+    cf_turnstile_response = serializers.CharField(
+        required=True,
+        allow_blank=False,
+        help_text="توکن کپچا که باید از کلاینت ارسال شود"
+    )

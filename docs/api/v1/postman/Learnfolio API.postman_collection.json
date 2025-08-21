@@ -10,222 +10,517 @@
 			"name": "accounts",
 			"item": [
 				{
-					"name": "New Request",
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {}
-					},
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+					"name": "auth",
+					"item": [
+						{
+							"name": "submit-identity",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/v1/accounts/auth/submit-identity/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"submit-identity",
+										""
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "http://localhost:8000/api/v1/accounts/auth/submit-identity/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"accounts",
-								"auth",
-								"submit-identity",
-								""
-							]
+						{
+							"name": "verify-otp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"otp\": \"111111\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/v1/accounts/auth/verify-otp/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"verify-otp",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "resend-otp-or-link",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNjMyODM2LCJpYXQiOjE3NTM2MzE5MzYsImp0aSI6ImIxOGVhNGE0NzkwZTQ2YjFiNzYwZmJmZjUxMzM0YzIyIiwidXNlcl9pZCI6NH0.mRL9db7vZheVZ8pKtMJaJDjnBjoENk2qSu5raNLQ8Dw",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/v1/accounts/auth/resend-otp-or-link/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"resend-otp-or-link",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "login-password",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNjMyODM2LCJpYXQiOjE3NTM2MzE5MzYsImp0aSI6ImIxOGVhNGE0NzkwZTQ2YjFiNzYwZmJmZjUxMzM0YzIyIiwidXNlcl9pZCI6NH0.mRL9db7vZheVZ8pKtMJaJDjnBjoENk2qSu5raNLQ8Dw",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identity\": \"09111111111\",\r\n    \"password\": \"amir1234\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/v1/accounts/auth/login-password/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"login-password",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "verify-link",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"token\": \"eyJlbWFpbCI6ImFtaWlpcmlpaS5sYW1rLjEwQGdtYWlsLmNvbSIsInB1cnBvc2UiOiJyZWdpc3RlciJ9.aIUDTw.Hzmv3ehL4PFlxL21IF6ZKcoxvuE\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/v1/accounts/auth/verify-link/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"verify-link",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "token/refresh",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1NDgxOTk2NSwiaWF0IjoxNzU0MjE1MTY1LCJqdGkiOiIwZDY4NDRhYmE5MjU0YWNkODExNDVhYWNjNTI3Yzc2ZCIsInVzZXJfaWQiOjR9.z11jECIxyOje_AYHD6UFQTxncwpEkJcOEehWzljF3zk\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/v1/accounts/auth/token/refresh/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"token",
+										"refresh",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "logout",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU0NDE0MjcwLCJpYXQiOjE3NTQ0MTMzNzAsImp0aSI6Ijk4YWMwMDc3MjJhNjRmNGNiOWYzNjU0Yzk5MGU3MzE3IiwidXNlcl9pZCI6NH0._llz8RIlR_cdKbKw8NOXrgiMcLEiJreP4-6wD1idf44",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1NTAxODE3MCwiaWF0IjoxNzU0NDEzMzcwLCJqdGkiOiJkZTg1ZDZkYWExMmU0N2EwOTlmOTViMTE5YjE0NDljNiIsInVzZXJfaWQiOjR9.ENiIZxQCL1aMLKGPRsl2_DRBJgP6-ZEwN83XBUxmrj4\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/logout/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"logout",
+										""
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "New Request",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"otp\": \"111111\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+					"name": "password",
+					"item": [
+						{
+							"name": "request-password-reset",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identity\": \"09111111111\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/request-password-reset/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"request-password-reset",
+										""
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "http://localhost:8000/api/v1/accounts/auth/verify-otp/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"accounts",
-								"auth",
-								"verify-otp",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "New Request",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNjMyODM2LCJpYXQiOjE3NTM2MzE5MzYsImp0aSI6ImIxOGVhNGE0NzkwZTQ2YjFiNzYwZmJmZjUxMzM0YzIyIiwidXNlcl9pZCI6NH0.mRL9db7vZheVZ8pKtMJaJDjnBjoENk2qSu5raNLQ8Dw",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "otp-verification-password-reset",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identity\": \"09111111111\",\r\n    \"cf-turnstile-response\": \"token\",\r\n    \"otp\": \"726216\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/otp-verification-password-reset/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"otp-verification-password-reset",
+										""
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "http://localhost:8000/api/v1/accounts/auth/resend-otp-or-link/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"accounts",
-								"auth",
-								"resend-otp-or-link",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "New Request",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"token\": \"eyJlbWFpbCI6ImFtaWlpcmlpaS5sYW1rLjEwQGdtYWlsLmNvbSIsInB1cnBvc2UiOiJyZWdpc3RlciJ9.aIUDTw.Hzmv3ehL4PFlxL21IF6ZKcoxvuE\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "link-verification-password-reset",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"cf-turnstile-response\": \"token\",\r\n    \"token\": \"eyJlbWFpbCI6ImFtaWlpcmlpaS5sYW1rLjEwQGdtYWlsLmNvbSIsInB1cnBvc2UiOiJyZXNldF9wYXNzd29yZCJ9.aKYKSw.w_lXcr15T8z-LiYRkC1D-Vl4gKA\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/link-verification-password-reset/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"link-verification-password-reset",
+										""
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "http://localhost:8000/api/v1/accounts/auth/verify-link/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"accounts",
-								"auth",
-								"verify-link",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "New Request",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNjMyODM2LCJpYXQiOjE3NTM2MzE5MzYsImp0aSI6ImIxOGVhNGE0NzkwZTQ2YjFiNzYwZmJmZjUxMzM0YzIyIiwidXNlcl9pZCI6NH0.mRL9db7vZheVZ8pKtMJaJDjnBjoENk2qSu5raNLQ8Dw",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"identity\": \"09111111111\",\r\n    \"password\": \"amir1234\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "change-password",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1NzIxOTYwLCJpYXQiOjE3NTU3MjEwNjAsImp0aSI6IjRmNDJkYWY3NDQyNjRjMzhiYTFjMTU2NjI1Mjg4ZmU1IiwidXNlcl9pZCI6OX0.xCdcRhINiJ4O1tGn5fbAgaH8T_OzukOdnbuyo-v74J8",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"amir_1382\",\r\n    \"new_password\": \"amir_1382\",\r\n    \"confirm_password\": \"amir_1382\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/change-password/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"change-password",
+										""
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "http://localhost:8000/api/v1/accounts/auth/login-password/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"accounts",
-								"auth",
-								"login-password",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "New Request",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1NDgxOTk2NSwiaWF0IjoxNzU0MjE1MTY1LCJqdGkiOiIwZDY4NDRhYmE5MjU0YWNkODExNDVhYWNjNTI3Yzc2ZCIsInVzZXJfaWQiOjR9.z11jECIxyOje_AYHD6UFQTxncwpEkJcOEehWzljF3zk\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "reset-password",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"cf-turnstile-response\": \"token\",\r\n    \"reset_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6IjA5MTExMTExMTExIiwidHlwZSI6InJlc2V0X3Bhc3N3b3JkIiwiZXhwIjoxNzU1Nzc0ODkzLCJpYXQiOjE3NTU3NzMwOTN9.d9iW7sXtITk6X_hNKvxRR_Q-VM_sFS3upenqROgv3h0\",\r\n    \"new_password\": \"amir_1382\",\r\n    \"confirm_password\": \"amir_1382\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/reset-password/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"reset-password",
+										""
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "http://localhost:8000/api/v1/accounts/auth/token/refresh/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"accounts",
-								"auth",
-								"token",
-								"refresh",
-								""
-							]
+						{
+							"name": "first-time-password",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1NzE0MTM5LCJpYXQiOjE3NTU3MTMyMzksImp0aSI6IjNiYzM4YjkzODYxYjQ5ZGQ5MjFmYzE0OTEwOTM4ZDQ1IiwidXNlcl9pZCI6OX0.Bd3Du1nE4ZfMFNX4tJDjg7Ouk3KYKaqRyD9r2zuHMQM",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"new_password\": \"amir_1382\",\r\n    \"confirm_password\": \"amir_1382\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/first-time-password/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"v1",
+										"accounts",
+										"auth",
+										"first-time-password",
+										""
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				}
 			]
 		}
