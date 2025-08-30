@@ -1,4 +1,4 @@
-# 📌 Endpoint: `POST /api/v1/accounts/auth/submit-identity/`
+# 📌 Endpoint: `POST /api/accounts/v1/auth/submit-identity/`
 
 ### 🎯 کاربرد:
 
@@ -33,7 +33,7 @@
 
 ### ➤ Method: `POST`
 
-### ➤ URL: `/api/v1/accounts/auth/submit-identity/`
+### ➤ URL: `/api/accounts/v1/auth/submit-identity/`
 
 ---
 

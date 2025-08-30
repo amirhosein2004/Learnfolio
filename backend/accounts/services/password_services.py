@@ -29,7 +29,7 @@ def handle_password_reset(identity: str) -> tuple[str, str, str]:
             logger.info(f"Password reset link sent to {identity}")
         else:
             logger.info(f"Password reset attempted for non-existent email {identity}")
-        return "لینک تایید به ایمیل ارسال شد", purpose, reverse('accounts:password_verify_link')
+        return "لینک تایید به ایمیل ارسال شد", purpose, reverse('accounts_v1:password_verify_link')
     else:
         user_exists = User.objects.filter(phone_number=identity).exists()
         if user_exists:
@@ -37,7 +37,7 @@ def handle_password_reset(identity: str) -> tuple[str, str, str]:
             logger.info(f"Password reset OTP sent to {identity}")
         else:
             logger.info(f"Password reset attempted for non-existent phone {identity}")
-        return "کد تایید به شماره تلفن ارسال شد", purpose, reverse('accounts:password_verify_otp')
+        return "کد تایید به شماره تلفن ارسال شد", purpose, reverse('accounts_v1:password_verify_otp')
 
 def change_user_password(user: User, new_password: str):
     """change user password"""

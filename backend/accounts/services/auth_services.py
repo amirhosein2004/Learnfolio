@@ -33,17 +33,17 @@ def handle_identity_submission(identity: str) -> tuple[str, str, str]:
             # For registration, send confirmation link
             send_auth_email(email=identity, purpose=purpose)
             logger.info(f"Registration link sent to {identity}")
-            return ".لینک ثبت‌نام به ایمیل شما ارسال شد", purpose, reverse('accounts:verify_link')
+            return ".لینک ثبت‌نام به ایمیل شما ارسال شد", purpose, reverse('accounts_v1:verify_link')
 
         else:
             otp_code = send_auth_email(email=identity, purpose=purpose)
             logger.info(f"Login OTP sent to {identity}")
-            return ".کد تایید به ایمیل شما ارسال شد", purpose, reverse('accounts:verify_otp')
+            return ".کد تایید به ایمیل شما ارسال شد", purpose, reverse('accounts_v1:verify_otp')
             
     else:
         otp_code = send_otp_for_phone(phone_number=identity, purpose=purpose)
         logger.info(f"OTP sent to phone {identity}")
-        return f".کد تایید به شماره تلفن شما ارسال شد: {otp_code}", purpose, reverse('accounts:verify_otp')
+        return f".کد تایید به شماره تلفن شما ارسال شد: {otp_code}", purpose, reverse('accounts_v1:verify_otp')
 
 
 def login_or_register_user(identity: str) -> tuple[User, str, str]:

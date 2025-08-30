@@ -33,7 +33,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8000/api/v1/accounts/auth/submit-identity/",
+									"raw": "http://localhost:8000/api/accounts/v1/auth/submit-identity/",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -41,8 +41,8 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
+										"v1",
 										"auth",
 										"submit-identity",
 										""
@@ -66,7 +66,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8000/api/v1/accounts/auth/verify-otp/",
+									"raw": "http://localhost:8000/api/accounts/v1/auth/verify-otp/",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -74,8 +74,8 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
+										"v1",
 										"auth",
 										"verify-otp",
 										""
@@ -105,7 +105,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8000/api/v1/accounts/auth/resend-otp-or-link/",
+									"raw": "http://localhost:8000/api/accounts/v1/auth/resend-otp-or-link/",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -113,8 +113,8 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
+										"v1",
 										"auth",
 										"resend-otp-or-link",
 										""
@@ -145,7 +145,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8000/api/v1/accounts/auth/login-password/",
+									"raw": "http://localhost:8000/api/accounts/v1/auth/login-password/",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -153,8 +153,8 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
+										"v1",
 										"auth",
 										"login-password",
 										""
@@ -178,7 +178,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8000/api/v1/accounts/auth/verify-link/",
+									"raw": "http://localhost:8000/api/accounts/v1/auth/verify-link/",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -186,8 +186,8 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
+										"v1",
 										"auth",
 										"verify-link",
 										""
@@ -211,7 +211,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8000/api/v1/accounts/auth/token/refresh/",
+									"raw": "http://localhost:8000/api/accounts/v1/auth/token/refresh/",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -219,8 +219,8 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
+										"v1",
 										"auth",
 										"token",
 										"refresh",
@@ -251,7 +251,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/logout/",
+									"raw": "http://127.0.0.1:8000/api/accounts/v1/auth/logout/",
 									"protocol": "http",
 									"host": [
 										"127",
@@ -262,8 +262,8 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
+										"v1",
 										"auth",
 										"logout",
 										""
@@ -292,7 +292,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/request-password-reset/",
+									"raw": "http://127.0.0.1:8000/api/accounts/v1/password/request-password-reset/",
 									"protocol": "http",
 									"host": [
 										"127",
@@ -303,9 +303,9 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
-										"auth",
+										"v1",
+										"password",
 										"request-password-reset",
 										""
 									]
@@ -331,7 +331,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/otp-verification-password-reset/",
+									"raw": "http://127.0.0.1:8000/api/accounts/v1/password/verify-otp/",
 									"protocol": "http",
 									"host": [
 										"127",
@@ -342,10 +342,10 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
-										"auth",
-										"otp-verification-password-reset",
+										"v1",
+										"password",
+										"verify-otp",
 										""
 									]
 								}
@@ -370,7 +370,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/link-verification-password-reset/",
+									"raw": "http://127.0.0.1:8000/api/accounts/v1/password/verify-link/",
 									"protocol": "http",
 									"host": [
 										"127",
@@ -381,10 +381,10 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
-										"auth",
-										"link-verification-password-reset",
+										"v1",
+										"password",
+										"verify-link",
 										""
 									]
 								}
@@ -415,7 +415,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/change-password/",
+									"raw": "http://127.0.0.1:8000/api/accounts/v1/password/change-password/",
 									"protocol": "http",
 									"host": [
 										"127",
@@ -426,9 +426,9 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
-										"auth",
+										"v1",
+										"password",
 										"change-password",
 										""
 									]
@@ -454,7 +454,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/reset-password/",
+									"raw": "http://127.0.0.1:8000/api/accounts/v1/password/reset-password/",
 									"protocol": "http",
 									"host": [
 										"127",
@@ -465,9 +465,9 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
-										"auth",
+										"v1",
+										"password",
 										"reset-password",
 										""
 									]
@@ -499,7 +499,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://127.0.0.1:8000/api/v1/accounts/auth/first-time-password/",
+									"raw": "http://127.0.0.1:8000/api/accounts/v1/password/first-time-password/",
 									"protocol": "http",
 									"host": [
 										"127",
@@ -510,9 +510,9 @@
 									"port": "8000",
 									"path": [
 										"api",
-										"v1",
 										"accounts",
-										"auth",
+										"v1",
+										"password",
 										"first-time-password",
 										""
 									]

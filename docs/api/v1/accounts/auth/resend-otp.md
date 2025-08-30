@@ -1,4 +1,4 @@
-# 📌 Endpoint: `POST /api/v1/accounts/auth/resend-otp-or-link/`
+# 📌 Endpoint: `POST /api/accounts/v1/auth/resend-otp-or-link/`
 
 ### 🎯 کاربرد:
 
@@ -36,7 +36,7 @@
 
 ### ➤ Method: `POST`
 
-### ➤ URL: `/api/v1/accounts/auth/resend-otp-or-link/`
+### ➤ URL: `/api/accounts/v1/auth/resend-otp-or-link/`
 
 ---
 

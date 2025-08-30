@@ -1,4 +1,4 @@
-# 📌 Endpoint: `POST /api/v1/accounts/password/reset-password/`
+# 📌 Endpoint: `POST /api/accounts/v1/password/reset-password/`
 
 ### 🎯 کاربرد:
 
@@ -31,7 +31,7 @@
 
 ### ➤ Method: `POST`
 
-### ➤ URL: `/api/v1/accounts/password/reset-password/`
+### ➤ URL: `/api/accounts/v1/password/reset-password/`
 
 ---
 

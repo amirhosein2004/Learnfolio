@@ -1,4 +1,4 @@
-# 📌 Endpoint: `POST /api/v1/accounts/password/verify-link/`
+# 📌 Endpoint: `POST /api/accounts/v1/password/verify-link/`
 
 ### 🎯 کاربرد:
 
@@ -31,7 +31,7 @@
 
 ### ➤ Method: `POST`
 
-### ➤ URL: `/api/v1/accounts/password/verify-link/`
+### ➤ URL: `/api/accounts/v1/password/verify-link/`
 
 ---
 

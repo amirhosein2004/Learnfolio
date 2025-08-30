@@ -12,7 +12,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Accounts app URLs
-    path('api/v1/accounts/', include('accounts.api.v1.urls')),
+    path('api/accounts/', include('accounts.urls')),
 ]
 
 # active in dev 

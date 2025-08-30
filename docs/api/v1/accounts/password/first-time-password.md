@@ -1,4 +1,4 @@
-# 📌 Endpoint: `POST /api/v1/accounts/password/first-time-password/`
+# 📌 Endpoint: `POST /api/accounts/v1/password/first-time-password/`
 
 ### 🎯 کاربرد:
 
@@ -30,7 +30,7 @@
 
 ### ➤ Method: `POST`
 
-### ➤ URL: `/api/v1/accounts/password/first-time-password/`
+### ➤ URL: `/api/accounts/v1/password/first-time-password/`
 
 ---
 
