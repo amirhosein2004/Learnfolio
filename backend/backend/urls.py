@@ -13,6 +13,9 @@ urlpatterns = [
 
     # Accounts app URLs
     path('api/accounts/', include('accounts.urls')),
+
+    # Blog app URLs
+    path('api/blog/', include('blog.urls')),
 ]
 
 # active in dev 

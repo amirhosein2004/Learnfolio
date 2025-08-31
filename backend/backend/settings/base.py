@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     # Custom apps
     'accounts',
     'core',
+    "blog",
 
     # third party
     'rest_framework',         # Enables Django REST API support
