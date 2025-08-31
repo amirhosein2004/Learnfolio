@@ -5,9 +5,18 @@ from django.contrib.auth import get_user_model
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from urllib3 import request
 
 from drf_spectacular.utils import extend_schema
+from accounts.schema_docs.v1 import (
+    admin_profile_get_schema,
+    admin_profile_patch_schema,
+    user_profile_get_schema,
+    user_profile_patch_schema,
+    user_profile_delete_schema,
+    user_update_identity_schema,
+    confirm_email_update_schema,
+    verify_otp_phone_update_schema,
+)
 from accounts.api.v1.serializers.profile_serializers import (
     UserProfileSerializer,
     UserFullNameSerializer,
@@ -39,6 +48,13 @@ class UserProfileAPIView(APIView):
     permission_classes = [UserIsAuthenticated]
     throttle_classes = [CustomUserThrottle]
 
+    def get_throttles(self):
+        # set no throttles for get method
+        if self.request.method == "GET":
+            return [] 
+        return super().get_throttles()
+
+    @extend_schema(**user_profile_get_schema)
     def get(self, request):
         """
         Get user profile.
@@ -46,6 +62,7 @@ class UserProfileAPIView(APIView):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data)
     
+    @extend_schema(**user_profile_patch_schema)
     def patch(self, request):
         """
         Update user profile.
@@ -63,6 +80,7 @@ class UserProfileAPIView(APIView):
             logger.error(f"Error processing user profile update for {request.user.id}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
 
+    @extend_schema(**user_profile_delete_schema)
     def delete(self, request):
         """
         Delete user account.
@@ -85,6 +103,13 @@ class AdminProfileAPIView(APIView):
     permission_classes = [UserAdminIsAuthenticated]
     throttle_classes = [CustomUserThrottle]
 
+    def get_throttles(self):
+        # set no throttles for get method
+        if self.request.method == "GET":
+            return [] 
+        return super().get_throttles()
+
+    @extend_schema(**admin_profile_get_schema)
     def get(self, request):
         """
         Get admin profile.
@@ -93,6 +118,7 @@ class AdminProfileAPIView(APIView):
         serializer = AdminProfileSerializer(admin_user)
         return Response(serializer.data)
     
+    @extend_schema(**admin_profile_patch_schema)
     def patch(self, request):  
         """
         Update admin profile.
@@ -126,6 +152,7 @@ class UserUpdateEmailOrPhoneAPIView(APIView):
     permission_classes = [UserIsAuthenticated]
     throttle_classes = [CustomUserThrottle]
     
+    @extend_schema(**user_update_identity_schema)
     def patch(self, request):
         serializer = UserPhoneOrEmailUpdateSerilizer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -154,6 +181,7 @@ class VerifyOTPUserUpdatePhoneAPIView(APIView):
     permission_classes = [UserIsAuthenticated]
     throttle_classes = [CustomUserThrottle]
     
+    @extend_schema(**verify_otp_phone_update_schema)
     def patch(self, request):
         serializer = VerifyOTPUserPhoneUpdateSerilizer(instance=request.user, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -180,6 +208,7 @@ class ConfirmationLinkUserUpdateEmailAPIView(APIView):
     permission_classes = [UserIsAuthenticated]
     throttle_classes = [CustomUserThrottle]
     
+    @extend_schema(**confirm_email_update_schema)
     def patch(self, request):
         serializer = ConfirmationLinkEmailUpdateSerializer(instance=request.user, data=request.data)
         serializer.is_valid(raise_exception=True)
