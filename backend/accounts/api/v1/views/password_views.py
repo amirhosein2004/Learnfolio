@@ -43,6 +43,7 @@ User = get_user_model()
 
 logger = logging.getLogger(__name__)
 
+
 @extend_schema(**request_password_reset_schema)
 class RequestPasswordResetAPIView(APIView):
     """
@@ -68,11 +69,12 @@ class RequestPasswordResetAPIView(APIView):
 
         try:
             message, purpose, next_url = handle_password_reset(identity)
-            set_resend_cooldown(identity, 2 * 60)  # set cache for 2 minutes
+            set_resend_cooldown(identity, purpose=purpose, timeout=2 * 60)
             return Response({'detail': message, "next_url": next_url, "purpose": purpose}, status=200)
         except Exception:
             logger.error(f"Error processing for request password reset for {identity}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
+
 
 @extend_schema(**otp_verification_password_reset_schema)
 class OTPVerificationPasswordResetAPIView(APIView):
@@ -80,7 +82,7 @@ class OTPVerificationPasswordResetAPIView(APIView):
     Verify OTP for password reset.
 
     Accepts:
-    - `identity`: Email or phone number
+    - `identity`: phone number
     - `otp`: 6 digit number
     - `cf-turnstile-response`: CAPTCHA token (ia enable)
     
@@ -104,13 +106,14 @@ class OTPVerificationPasswordResetAPIView(APIView):
             logger.error(f"Error processing OTP verification for password reset for {serializer.validated_data['identity']}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
 
+
 @extend_schema(**link_verification_password_reset_schema)
 class LinkVerificationPasswordResetAPIView(APIView):
     """
     Verify confirmation link for password reset.
 
     Accepts:
-    - `identity`: Email or phone number
+    - `identity`: Email
     - `token`: token from link
     - `cf-turnstile-response`: CAPTCHA token (ia enable)
     
@@ -133,6 +136,7 @@ class LinkVerificationPasswordResetAPIView(APIView):
         except Exception:
             logger.error(f"Error processing link verification for password reset for {serializer.validated_data['identity']}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
+
 
 @extend_schema(**reset_password_schema)
 class ResetPasswordAPIView(APIView):
@@ -165,6 +169,7 @@ class ResetPasswordAPIView(APIView):
             logger.error(f"Error processing reset password for {serializer.context['identity']}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
 
+
 @extend_schema(**first_time_password_schema)
 class FirstTimePasswordAPIView(APIView):
     """
@@ -191,6 +196,7 @@ class FirstTimePasswordAPIView(APIView):
             logger.error(f"Error processing first time password for {request.user.id}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
 
+
 @extend_schema(**change_password_schema)
 class ChangePasswordAPIView(APIView):
     """
@@ -207,7 +213,7 @@ class ChangePasswordAPIView(APIView):
     permission_classes = [UserIsAuthenticated, HasPassword]  
     throttle_classes = [CustomUserThrottle] 
 
-    def post(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         serializer = ChangePasswordSerializer(data=request.data, context={'user': request.user})
         serializer.is_valid(raise_exception=True)
 

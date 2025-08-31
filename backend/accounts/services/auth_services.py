@@ -4,7 +4,8 @@ from typing import Any
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework.exceptions import ValidationError
 
 from accounts.services.cache_services import OTPCacheService
 from accounts.services.validation_services import get_identity_purpose
@@ -83,6 +84,24 @@ def generate_tokens_for_user(user: Any) -> dict[str, str]:
     }
 
 
+def logout_user(user, refresh_token: str):
+    """
+    Handle user logout by blacklisting the refresh token.
+    """
+    if not refresh_token:
+        raise ValidationError({"detail": '.لطفا توکن رفرش را ارسال کنید'})
+
+    try:
+        token = RefreshToken(refresh_token) # decode and validate and cnvert to RefreshToken object
+        token.blacklist()  # Blacklist the refresh token
+        logger.info(f"User {user.id} logged out successfully")
+        return True
+
+    except TokenError:
+        logger.warning(f"Invalid or expired token for user {user.id}")
+        raise ValidationError({"detail": ".توکن نامعتبر یا منقضی است"})
+
+
 def send_otp_for_phone(phone_number: str, purpose: str) -> str:
     """
     Generates and sends an OTP code via SMS for the given phone number.
@@ -116,7 +135,16 @@ def send_auth_email(email: str, purpose: str) -> str:
     Returns:
         str: The OTP code or confirmation link.
     """
-    if purpose == "register" or purpose == "reset_password":
+    if purpose == "login":
+        otp = OTPCacheService.generate_otp(email=email, purpose=purpose)
+        subject = "کد تایید"
+        message = f"{otp}:کد تایید شما"
+
+        # Generate and send OTP via email
+        send_email_task.delay(email, subject, message)
+        logger.info(f"OTP Sent to {email} with async Celery task for purpose '{purpose}'")
+        return otp
+    else:
         token = generate_email_token(email, purpose)
         link = f"http://localhost:8000/api/auth/verify-otp-or-link/?email={email}&token={token}&purpose={purpose}"
         subject = "لینک تایید ایمیل"
@@ -126,13 +154,4 @@ def send_auth_email(email: str, purpose: str) -> str:
         send_email_task.delay(email, subject, message)
         logger.info(f"Verification link sent to {email} with async Celery task for purpose '{purpose}'")
         return link
-
-    else:
-        otp = OTPCacheService.generate_otp(email=email, purpose=purpose)
-        subject = "کد تایید"
-        message = f"{otp}:کد تایید شما"
-
-        # Generate and send OTP via email
-        send_email_task.delay(email, subject, message)
-        logger.info(f"OTP Sent to {email} with async Celery task for purpose '{purpose}'")
-        return otp
+        

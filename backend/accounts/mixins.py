@@ -2,7 +2,7 @@ import re
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
-
+from django.core.validators import URLValidator
 
 class IdentityValidationMixin:
     def validate_identity(self, value):
@@ -65,6 +65,7 @@ class IdentityValidationMixin:
         """
         return re.match(r'^09\d{9}$', phone)
 
+
 class CaptchaSerializerMixin:
     """
     Mixin for serializers that require captcha validation.
@@ -74,3 +75,70 @@ class CaptchaSerializerMixin:
         allow_blank=False,
         help_text="توکن کپچا که باید از کلاینت ارسال شود"
     )
+
+
+class UniqueIdentityValidationMixin:
+    def validate_identity(self, value: str) -> str:
+        is_email = '@' in value
+        lookup = {'email__iexact': value} if is_email else {'phone__iexact': value}
+
+        if User.objects.filter(**lookup).exists():
+            msg = ".این ایمیل قبلاً ثبت شده است" if is_email else ".این شماره قبلاً ثبت شده است"
+            raise serializers.ValidationError(msg)
+        
+        return value
+
+
+class SocialNetworksValidationMixin:
+    """
+    Mixin for validating social network links.
+    Ensures the structure is a dict, platforms are allowed, 
+    and URLs match the expected format.
+    """
+
+    allowed_platforms = [
+        "instagram", "telegram", "twitter", "linkedin",
+        "youtube", "github", "website", "facebook",
+    ]
+
+    def validate_social_networks(self, value):
+        """
+        Validate social networks data structure and URLs.
+        """
+        if value is None:
+            return value
+
+        if not isinstance(value, dict):
+            raise serializers.ValidationError(".شبکه‌های اجتماعی باید به صورت دیکشنری باشد")
+
+        url_validator = URLValidator()
+
+        for platform, url in value.items():
+            # --- Check platform is allowed
+            if platform not in self.allowed_platforms:
+                raise serializers.ValidationError(f".مجاز نیست {platform} پلتفرم")
+
+            # --- Check URL format
+            if url and isinstance(url, str):
+                try:
+                    url_validator(url)
+                except DjangoValidationError:
+                    raise serializers.ValidationError(f".مجاز نیست {platform} لینک")
+
+                # --- Extra platform-specific checks
+                if platform == "instagram" and not re.match(r"https?://(www\.)?instagram\.com/.+", url):
+                    raise serializers.ValidationError(f".باشد instagram.com لینک اینستاگرام باید از دامنه")
+
+                elif platform == "telegram" and not re.match(r"https?://(t\.me|telegram\.me)/.+", url):
+                    raise serializers.ValidationError(f".باشد t.me یا telegram.me لینک تلگرام باید از دامنه")
+
+                elif platform == "github" and not re.match(r"https?://(www\.)?github\.com/.+", url):
+                    raise serializers.ValidationError(f".باشد github.com لینک گیت‌هاب باید از دامنه")
+
+                elif platform == "linkedin" and not re.match(r"https?://(www\.)?linkedin\.com/.+", url):
+                    raise serializers.ValidationError(f".باشد linkedin.com لینک لینکدین باید از دامنه")
+
+            elif url is not None and not isinstance(url, str):
+                raise serializers.ValidationError(f"لینک {platform} باید رشته متنی باشد")
+
+        return value

@@ -13,20 +13,19 @@ from accounts.services.validation_services import validate_reset_password_token
 
 User = get_user_model()
 
-class ResetPasswordConfirmationLinkSerializer(BaseEmailConfirmationLinkSerializer):
+class ResetPasswordConfirmationLinkSerializer(BaseEmailConfirmationLinkSerializer, CaptchaSerializerMixin):
     """
     Serializer for validating resetting password with a confirmation link.
     """
     pass
 
-class ResetOTPVerificationSerializer(BaseOTPVerificationSerializer):
+class ResetOTPVerificationSerializer(BaseOTPVerificationSerializer, CaptchaSerializerMixin):
     """
     Serializer for verifying an OTP code and identity.
     Requires identity and code.
     """
-    #TODO: این فعلا برای شماره ها ایت اما ایمیل ها را هم حمدود نمیکنیم
 
-    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+    def validate(self, attrs):
         """
         Validate the OTP code for the given identity.
         Checks if the OTP exists, is valid, and not expired.

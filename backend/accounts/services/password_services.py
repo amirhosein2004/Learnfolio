@@ -27,7 +27,7 @@ def handle_password_reset(identity: str) -> tuple[str, str, str]:
         if user_exists:
             send_auth_email(email=identity, purpose=purpose)
             logger.info(f"Password reset link sent to {identity}")
-        else:
+        else: # we dont say user does not exist because security reasons
             logger.info(f"Password reset attempted for non-existent email {identity}")
         return "لینک تایید به ایمیل ارسال شد", purpose, reverse('accounts_v1:password_verify_link')
     else:
@@ -35,7 +35,7 @@ def handle_password_reset(identity: str) -> tuple[str, str, str]:
         if user_exists:
             send_otp_for_phone(phone_number=identity, purpose=purpose)
             logger.info(f"Password reset OTP sent to {identity}")
-        else:
+        else: # we dont say user does not exist because security reasons
             logger.info(f"Password reset attempted for non-existent phone {identity}")
         return "کد تایید به شماره تلفن ارسال شد", purpose, reverse('accounts_v1:password_verify_otp')
 

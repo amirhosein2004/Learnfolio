@@ -16,8 +16,8 @@ def get_identity_purpose(identity: str, context: str = None) -> Literal["login",
     Determine purpose based on existence of user.
     Returns 'login' if user exists, else 'register' or 'reset_password' based on context.
     """
-    if context == "reset_password":
-        return "reset_password"
+    if context:
+        return context
     
     if '@' in identity:
         return "login" if User.objects.filter(email__iexact=identity).exists() else "register"

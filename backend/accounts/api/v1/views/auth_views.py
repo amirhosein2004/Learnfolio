@@ -5,8 +5,6 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError
 
 from drf_spectacular.utils import extend_schema
 
@@ -28,6 +26,7 @@ from accounts.services.auth_services import (
     handle_identity_submission,
     login_or_register_user,
     generate_tokens_for_user,
+    logout_user
 )
 from accounts.services.cache_services import (
     can_resend,
@@ -42,9 +41,12 @@ from core.throttles.throttles import (
     TokenRefreshAnonThrottle
 )
 
+
 User = get_user_model()
 
+
 logger = logging.getLogger(__name__)
+
 
 @extend_schema(**identity_submit_schema)
 class IdentitySubmissionAPIView(APIView):
@@ -71,11 +73,12 @@ class IdentitySubmissionAPIView(APIView):
 
         try:
             message, purpose, next_url = handle_identity_submission(identity)
-            set_resend_cooldown(identity, 2 * 60)  # set cache for 2 minutes
+            set_resend_cooldown(identity, purpose=purpose, timeout=2 * 60)
             return Response({'detail': message, "next_url": next_url, "purpose": purpose}, status=200)
         except Exception:
             logger.error(f"Error processing identity submission for {identity}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)       
+
 
 @extend_schema(**otp_verification_schema)
 class OTPOrVerificationAPIView(APIView):
@@ -115,6 +118,7 @@ class OTPOrVerificationAPIView(APIView):
             logger.error(f"Error processing OTP or link verification for {identity}", exc_info=True)
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
 
+
 @extend_schema(**link_verification_schema)
 class LinkVerificationAPIView(APIView):
     """
@@ -153,6 +157,7 @@ class LinkVerificationAPIView(APIView):
             logger.error(f"Error processing OTP or link verification for {identity}", exc_info=True)
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
 
+
 @extend_schema(**resend_otp_or_link_schema)
 class ResendOTPOrLinkAPIView(APIView):
     """
@@ -188,12 +193,13 @@ class ResendOTPOrLinkAPIView(APIView):
             )
         try:
             message, purpose, next_url = handle_identity_submission(identity)
-            set_resend_cooldown(identity, 2 * 60)  # set cache for 2 minutes
+            set_resend_cooldown(identity, purpose=purpose, timeout=2 * 60)
             logger.info(f"resending for {identity}")
             return Response({'detail': message, "next_url": next_url, "purpose": purpose}, status=200)
         except Exception:
             logger.error(f"Error resending for {identity}", exc_info=True)
             return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
+
 
 @extend_schema(**password_login_schema)
 class PasswordLoginAPIView(APIView):
@@ -233,6 +239,7 @@ class PasswordLoginAPIView(APIView):
             logger.error(f"Error processing logging with password for identityt {identity}", exc_info=True)
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
         
+
 @extend_schema(**logout_schema)
 class LogoutAPIView(APIView):
     """
@@ -242,20 +249,16 @@ class LogoutAPIView(APIView):
 
     def post(self, request):
         refresh_token = request.data.get('refresh', None)
-        if not refresh_token:
-            return Response({'detail': '.لطفا توکن رفرش را ارسال کنید'}, status=400)
         
         try:
-            token = RefreshToken(refresh_token)
-            token.blacklist()  # Blacklist the refresh token
-            logger.info(f"User {request.user.id} logged out successfully")
+            logout_user(request.user, refresh_token)
             return Response({'detail': '.با موفقیت خارج شدید'}, status=205)
-        except TokenError:
-            logger.warning(f"Invalid or expired token for user {request.user.id}")
-            return Response({'detail': '.توکن نامعتبر یا منقضی است'}, status=400)
+        except ValidationError as e:
+            return Response(e.detail, status=400)
         except Exception:
             logger.error(f"Error during logout for user {request.user.id}", exc_info=True)
             return Response({'detail': '.خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
+
 
 @extend_schema(summary="دریافت توکن دسترسی و رفرش توکن جدید" ,tags=['auth'])        
 class CustomTokenRefreshView(TokenRefreshView):

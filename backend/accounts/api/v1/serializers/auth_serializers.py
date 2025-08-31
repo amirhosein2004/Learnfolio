@@ -11,17 +11,18 @@ from accounts.services.validation_services import (
     get_valid_otp,
     validate_user_with_password,
 )
+from accounts.mixins import CaptchaSerializerMixin
 from accounts.services.validation_services import get_identity_purpose
 
 User = get_user_model()
 
-class IdentitySerializer(BaseIdentitySerializer):
+class IdentitySerializer(BaseIdentitySerializer, CaptchaSerializerMixin):
     """
     Serializer to validate a user's identity (email or phone number).
     """
     pass
 
-class AuthenticateOTPVerificationSerializer(BaseOTPVerificationSerializer):
+class AuthenticateOTPVerificationSerializer(BaseOTPVerificationSerializer, CaptchaSerializerMixin):
     """
     Serializer for verifying an OTP code and identity.
     Requires identity and code.
@@ -42,7 +43,7 @@ class AuthenticateOTPVerificationSerializer(BaseOTPVerificationSerializer):
 
         return attrs
     
-class RegisterConfirmationLinkSerializer(BaseEmailConfirmationLinkSerializer):
+class RegisterConfirmationLinkSerializer(BaseEmailConfirmationLinkSerializer, CaptchaSerializerMixin):
     """
     Serializer for verifying a registration confirmation link.
     Requires identity and token.
@@ -53,7 +54,7 @@ class RegisterConfirmationLinkSerializer(BaseEmailConfirmationLinkSerializer):
             raise serializers.ValidationError(".این ایمیل قبلاً ثبت شده است")
         return super().validate_identity(value)
 
-class PasswordLoginSerializer(BaseIdentitySerializer):
+class PasswordLoginSerializer(BaseIdentitySerializer, CaptchaSerializerMixin):
     """
     Serializer for logging in with identity (email or phone) and password.
     """

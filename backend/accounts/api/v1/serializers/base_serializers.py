@@ -1,11 +1,11 @@
 from typing import Any
 from rest_framework import serializers
-from accounts.mixins import IdentityValidationMixin, CaptchaSerializerMixin
+from accounts.mixins import IdentityValidationMixin
 from accounts.services.validation_services import verify_email_link
 from django.contrib.auth.password_validation import validate_password
 
 # common base classes
-class BaseIdentitySerializer(serializers.Serializer, IdentityValidationMixin, CaptchaSerializerMixin):
+class BaseIdentitySerializer(serializers.Serializer, IdentityValidationMixin):
     """
     Shared base serializer that includes identity field and validation.
     Should not be used directly in views.
