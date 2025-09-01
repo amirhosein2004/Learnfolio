@@ -17,15 +17,17 @@ admin_profile_get_schema = {
                             "linkedin": "https://linkedin.com/in/admin",
                             "github": "https://github.com/admin"
                         },
-                        "description": "مدیر سیستم آموزشی لرن‌فولیو"
+                        "description": "مدیر سیستم آموزشی لرن‌فولیو",
+                        "image": "http://example.com/media/profile_images/admin.jpg"
                     },
                     response_only=True,
                 ),
                 OpenApiExample(
                     name="پروفایل ادمین خالی",
                     value={
-                        "social_networks": "",
-                        "description": ""
+                        "social_networks": {},
+                        "description": "",
+                        "image": None
                     },
                     response_only=True,
                 ),
@@ -49,7 +51,7 @@ admin_profile_get_schema = {
     "description": (
         "This API returns the admin user's profile information.\n\n"
         "- Admin authentication is required ✅\n"
-        "- Returns admin's social networks and description\n"
+        "- Returns admin's social networks, description and profile image\n"
         "- Only staff users can access this endpoint\n"
         "- Request rate limiting (Throttle) is enabled ⏱️"
     ),
@@ -71,10 +73,11 @@ admin_profile_patch_schema = {
             ]
         ),
         400: OpenApiResponse(
-            description=".خطاهای اعتبارسنجی شبکه‌های اجتماعی یا توضیحات",
+            description=".خطاهای اعتبارسنجی شبکه‌های اجتماعی، توضیحات یا تصویر",
             response={
                 "social_networks": [".فرمت شبکه‌های اجتماعی معتبر نیست"],
-                "description": [".توضیحات باید حداکثر 1000 حرف باشد"]
+                "description": [".توضیحات باید حداکثر 1000 حرف باشد"],
+                "image": [".داده ارسالی فایل نیست. لطفا نوع داده را بررسی کنید"]
             },
             examples=[
                 OpenApiExample(
@@ -95,6 +98,16 @@ admin_profile_patch_schema = {
                 OpenApiExample(
                     name="توضیحات طولانی",
                     value={"description": [".توضیحات باید حداکثر 1000 حرف باشد"]},
+                    response_only=True,
+                ),
+                OpenApiExample(
+                    name="تصویر نامعتبر",
+                    value={"image": ["داده ارسالی فایل نیست. لطفا نوع داده را بررسی کنید"]},
+                    response_only=True,
+                ),
+                OpenApiExample(
+                    name="حجم تصویر زیاد",
+                    value={"image": ["حجم تصویر باید کمتر از ۱۰ مگابایت باشد"]},
                     response_only=True,
                 ),
             ]
@@ -118,9 +131,11 @@ admin_profile_patch_schema = {
     "description": (
         "This API allows admin users to update their profile information.\n\n"
         "- Admin authentication is required ✅\n"
-        "- Can update social networks and description\n"
+        "- Can update social networks, description and profile image\n"
         "- Social networks must be valid URLs from allowed platforms\n"
         "- Description has a maximum length of 1000 characters\n"
+        "- Image must be a valid file\n"
+        "- Image size must be less than 10MB\n"
         "- Request rate limiting (Throttle) is enabled ⏱️"
     ),
     "tags": ["profile"],

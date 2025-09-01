@@ -3,7 +3,8 @@
 		"_postman_id": "e1a8d4f7-0819-40cb-b8a1-73e699d4f070",
 		"name": "Learnfolio API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "42846789"
+		"_exporter_id": "42846789",
+		"_collection_link": "https://learnfolio.postman.co/workspace/learnfolio-Workspace~7abb4d86-ebb2-4f27-893c-338a8882106f/collection/42846789-e1a8d4f7-0819-40cb-b8a1-73e699d4f070?action=share&source=collection_link&creator=42846789"
 	},
 	"item": [
 		{
@@ -667,18 +668,32 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2NjM2MzU5LCJpYXQiOjE3NTY2MzU0NTksImp0aSI6ImY5MTQ0ZGU5YzQ2NDQ5ZDY4MTVlMGJjOTRmYTUxYmJhIiwidXNlcl9pZCI6Mn0.6XdUbbsKnA535nVHjC5ZXn6zn7dBlvFj5f6J7urODns",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2NzE3NjE4LCJpYXQiOjE3NTY3MTY3MTgsImp0aSI6ImY1NzA2ODlhOWEzNTQzOTdiZGUzZGVmMzRiMTdmMTc1IiwidXNlcl9pZCI6Mn0.Kt-nq54N5IHE54N7osQPAhy8nqRCCJuNTIItB9azezs",
 										"type": "text"
 									}
 								],
 								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"description\": \"hi\",\r\n    \"social_networks\": {\r\n        \"github\": \"https://github.com/amirhosein2004\"\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "description",
+											"value": "hi",
+											"description": "string",
+											"type": "text"
+										},
+										{
+											"key": "social_networks",
+											"value": "{\"github\": \"https://github.com/amirhosei004\"}",
+											"description": "jsonfield",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"description": "file image",
+											"type": "file",
+											"src": "postman-cloud:///1f0869aa-138b-48a0-b3e7-c3271771374b"
 										}
-									}
+									]
 								},
 								"url": {
 									"raw": "http://127.0.0.1:8000/api/accounts/v1/profile/admin/me/",
@@ -832,6 +847,244 @@
 							"response": []
 						}
 					]
+				}
+			]
+		},
+		{
+			"name": "blog",
+			"item": [
+				{
+					"name": "list blogs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/blog/v1/blogs/?search=tet&page=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"blog",
+								"v1",
+								"blogs",
+								""
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "tet"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create blog",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2NzE0NzkyLCJpYXQiOjE3NTY3MTM4OTIsImp0aSI6IjM3MzIyNThiMDY0ZjRjZDc4ZWFlNjQ1NDlmNzE0N2NkIiwidXNlcl9pZCI6Mn0.Aqyj95MUip4CKD-sCC3NOJ0Emn35R7reRNArbXVWi_I",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "سلام علیک",
+									"description": "string",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "کسشر پروژه است ایا",
+									"description": "string",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"description": "file",
+									"type": "file",
+									"src": "postman-cloud:///1f0869aa-1202-4790-9c60-e188b8040528"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/blog/v1/blogs/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"blog",
+								"v1",
+								"blogs",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "detail blog",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/blog/v1/blogs/tetetgrerg-tgtg/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"blog",
+								"v1",
+								"blogs",
+								"tetetgrerg-tgtg",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update blog",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2NjY3NjU1LCJpYXQiOjE3NTY2NjY3NTUsImp0aSI6Ijg5YjQ1NWI0ZTZkMDQ4OTJiY2U2YzQ1MmYwY2FjOTVhIiwidXNlcl9pZCI6Mn0.43lKyXBuyJZwH8xsxCe1UDzAU0fnegAHb2bW3oHPvpI",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "test",
+									"description": "string",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "test",
+									"description": "string",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"description": "file",
+									"type": "file",
+									"src": "postman-cloud:///1f0869d0-78a0-4a80-97fc-66d1b05cd33a"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/blog/v1/blogs/test/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"blog",
+								"v1",
+								"blogs",
+								"test",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update blog",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2NjY3NjU1LCJpYXQiOjE3NTY2NjY3NTUsImp0aSI6Ijg5YjQ1NWI0ZTZkMDQ4OTJiY2U2YzQ1MmYwY2FjOTVhIiwidXNlcl9pZCI6Mn0.43lKyXBuyJZwH8xsxCe1UDzAU0fnegAHb2bW3oHPvpI",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "test2",
+									"description": "string",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/blog/v1/blogs/test/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"blog",
+								"v1",
+								"blogs",
+								"test",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete blog",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2NzEzODgxLCJpYXQiOjE3NTY3MTI5ODEsImp0aSI6IjUwOTU3NDFhN2ZmMzQ3ZWViZjI2MmE2MzVlMWFlYzIzIiwidXNlcl9pZCI6Mn0.fKJQKnPxbPlsIrsZF8qDph9BArpmT37tW3L1NYadwq0",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/blog/v1/blogs/بلیلفل65745ل-ف55/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"blog",
+								"v1",
+								"blogs",
+								"بلیلفل65745ل-ف55",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

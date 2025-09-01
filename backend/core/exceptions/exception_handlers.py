@@ -1,6 +1,9 @@
 from rest_framework.views import exception_handler
 from rest_framework.exceptions import Throttled, PermissionDenied
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
+from django.http import Http404
+
 
 def custom_exception_handler(exc, context):
     """
@@ -18,6 +21,10 @@ def custom_exception_handler(exc, context):
         # Return a custom response for Permission errors
         detail = getattr(exc, 'detail', '.شما مجاز به ارسال درخواست به این بخش نبستید')
         return Response({'detail': str(detail)}, status=403)
+
+    if isinstance(exc, (NotFound, Http404)):
+        # Return a custom response for Not Found errors
+        return Response({'detail': '.صفحه مورد نظر یافت نشد'}, status=404)
 
     # Use DRF's default exception handler for other errors
     response = exception_handler(exc, context)
