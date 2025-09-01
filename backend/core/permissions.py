@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.exceptions import PermissionDenied
 
 
@@ -45,3 +45,22 @@ class UserAdminIsAuthenticated(UserIsAuthenticated):
         if not request.user.is_staff:
             raise PermissionDenied(detail=".شما به این بخش دسترسی ندارید")
         return super().has_permission(request, view)
+
+
+class UserAdminOrReadOnly(BasePermission):
+    """
+    everyone read-only (GET, HEAD, OPTIONS) 
+    only admin can POST, PUT, PATCH, DELETE
+    """
+
+    def has_permission(self, request, view):
+        # methods read-only free for evryone
+        if request.method in SAFE_METHODS:
+            return True
+
+        # for change methods only admin can
+        if not request.user.is_staff:
+            raise PermissionDenied(detail=".شما به این بخش دسترسی ندارید")
+
+        # if admin check ia authenticated
+        return request.user.is_authenticated

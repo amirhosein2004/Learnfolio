@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'drf_spectacular',        # Auto-generates OpenAPI schema and Swagger docs
     'rest_framework_simplejwt', # JWT authentication for REST framework
     'rest_framework_simplejwt.token_blacklist', # Token blacklist for JWT authentication
+    'ckeditor',               # Rich text editor
+    'ckeditor_uploader',      # File upload support for CKEditor
+    'django_filters',         # Django filter backend
 ]
 
 # Middleware configuration
@@ -217,3 +220,17 @@ SPECTACULAR_SETTINGS = {
     'ENABLE_EXAMPLES': True, # active examples 
     'EXAMPLES_ENABLED': True, # active examples 
 }
+
+# CKEditor configuration
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+    },
+}
+
+# Media files configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
