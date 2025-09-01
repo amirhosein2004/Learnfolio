@@ -51,6 +51,9 @@ class AdminProfile(models.Model):
     user = models.OneToOneField("accounts.User", on_delete=models.CASCADE, related_name='admin_profile') # One-to-one link to the custom user model
     social_networks = models.JSONField(default=dict, blank=True)
     description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='admin_profiles/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Admin: {self.user.full_name}"

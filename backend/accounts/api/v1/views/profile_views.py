@@ -1,4 +1,5 @@
 import logging
+from re import T
 from rest_framework import status
 
 from django.contrib.auth import get_user_model
@@ -30,6 +31,7 @@ from accounts.services.cache_services import set_resend_cooldown
 from core.permissions import UserIsAuthenticated, UserAdminIsAuthenticated
 from core.throttles.throttles import CustomUserThrottle
 from accounts.models import AdminProfile
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 User = get_user_model()
@@ -70,7 +72,7 @@ class UserProfileAPIView(APIView):
         Accepts:
         - `full_name`: Full name
         """
-        serializer = UserFullNameSerializer(instance=request.user, data=request.data)
+        serializer = UserFullNameSerializer(instance=request.user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
         try:
@@ -102,6 +104,7 @@ class AdminProfileAPIView(APIView):
     """
     permission_classes = [UserAdminIsAuthenticated]
     throttle_classes = [CustomUserThrottle]
+    parser_classes = [MultiPartParser, FormParser] # for upload file
 
     def get_throttles(self):
         # set no throttles for get method
@@ -128,7 +131,7 @@ class AdminProfileAPIView(APIView):
         - `description`: Description
         """      
         admin_user = AdminProfile.objects.get(user=request.user)
-        serializer = AdminProfileSerializer(instance=admin_user, data=request.data)
+        serializer = AdminProfileSerializer(instance=admin_user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
         try:

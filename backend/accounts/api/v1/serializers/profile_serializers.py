@@ -65,29 +65,39 @@ class AdminProfileSerializer(serializers.ModelSerializer, SocialNetworksValidati
     """
     class Meta:
         model = AdminProfile
-        fields = ['social_networks', 'description']
+        fields = ['social_networks', 'description', 'image']
         extra_kwargs = {
             'description': {
-                'required': False,
-                'allow_blank': True,
                 'max_length': 1000,
                 'error_messages': {
                     'max_length': '.توضیحات باید حداکثر 1000 حرف باشد'
                 }
             },
             'social_networks': {
-                'required': False,
-                'allow_null': True,
                 'error_messages': {
                     'invalid': '.فرمت شبکه‌های اجتماعی معتبر نیست'
                 }
-            }
+            },
+            'image': {
+                'error_messages': {
+                    'invalid': 'داده ارسالی فایل نیست. لطفا نوع داده را بررسی کنید',
+                },
+            },
         }
 
+
+    # NOTE: later we can add advance image validation for scan image file
+    def validate_image(self, value):
+        if not hasattr(value, 'file') and not hasattr(value, 'read'):
+            raise serializers.ValidationError("فایل تصویر معتبر نیست. لطفاً یک تصویر معتبر انتخاب کنید")
+        if value.size > 10 * 1024 * 1024:
+            raise serializers.ValidationError("حجم تصویر باید کمتر از ۱۰ مگابایت باشد")
+        return value
 
     def update(self, instance, validated_data):
         instance.social_networks = validated_data.get('social_networks', instance.social_networks)
         instance.description = validated_data.get('description', instance.description)
+        instance.image = validated_data.get('image', instance.image)
         instance.save()
         return instance
 

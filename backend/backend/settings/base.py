@@ -230,7 +230,3 @@ CKEDITOR_CONFIGS = {
         'width': '100%',
     },
 }
-
-# Media files configuration
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'

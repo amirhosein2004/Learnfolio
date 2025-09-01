@@ -36,3 +36,7 @@ else:
 
 # Allow all origins (only for development)
 CORS_ALLOW_ALL_ORIGINS = True 
+
+# Media files configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
