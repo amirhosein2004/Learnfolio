@@ -13,3 +13,5 @@
 - [setup.md](./setup.md): راهنمای راه‌اندازی پروژه
 - [frontend-guide.md](./frontend-guide.md): راهنمای فرانت‌اند
 - [logging.md](./logging.md): سیستم لاگ‌گیری
+- [flows](./flows): فرایند های مختلف پروژه و فلو چارت ها
+
