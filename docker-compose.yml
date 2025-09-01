@@ -1,22 +1,90 @@
-version: '3.9'
-
 services:
   web:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+          ENVIRONMENT: ${DJANGO_ENV}
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
+      - ./backend/logs:/app/logs # for log files
     ports:
       - "8000:8000"
     env_file:
-      - ./backend/.env
+      - ./.env
     depends_on:
       - db
+      - rabbitmq
+    logging:  # Limit container logs to 10MB per file, keep 3 files max
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped  
+
+  celery:
+    build:
+      context: ./backend
+      args:
+          ENVIRONMENT: ${DJANGO_ENV}
+    command: celery -A backend worker --loglevel=info
+    volumes:
+      - ./backend:/app
+      - ./backend/logs:/app/logs
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - rabbitmq
+      - web
+    logging:  # Limit container logs to 10MB per file, keep 3 files max
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+
+  celery_beat:
+    build:
+      context: ./backend 
+      args:
+          ENVIRONMENT: ${DJANGO_ENV}
+    command: celery -A backend beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./backend:/app
+      - ./backend/logs:/app/logs
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - rabbitmq
+      - web
+    logging:  # Limit container logs to 10MB per file, keep 3 files max
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+      
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"      # celery broker
+      - "15672:15672"    # RabbitMQ management panel
     environment:
-      - DJANGO_ENV=dev
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    logging:  # Limit container logs to 10MB per file, keep 3 files max
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped 
 
   db:
     image: postgres:15
+    container_name: db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-mydb}
       POSTGRES_USER: ${POSTGRES_USER:-myuser}
@@ -25,6 +93,27 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    logging:  # Limit container logs to 10MB per file, keep 3 files max
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped 
+  
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    logging:  # Limit container logs to 10MB per file, keep 3 files max
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
 
 volumes:
-  pgdata: 
+  pgdata:
+  redis_data:

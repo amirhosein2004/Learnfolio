@@ -50,10 +50,9 @@ instance/
 local_settings.py
 *.pot
 *.mo
-*.log
+*.log.*
 
 # Django migrations (optional)
-**/migrations/*.py
 **/migrations/*.pyc
 
 # Coverage & testing
