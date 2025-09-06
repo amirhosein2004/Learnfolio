@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.exceptions import ValidationError
 
 from drf_spectacular.utils import extend_schema
 
@@ -12,7 +13,6 @@ from accounts.schema_docs.v1 import (
     identity_submit_schema,
     otp_verification_schema,
     link_verification_schema,
-    resend_otp_or_link_schema,
     password_login_schema,
     logout_schema
 )
@@ -28,6 +28,7 @@ from accounts.services.auth_services import (
     generate_tokens_for_user,
     logout_user
 )
+from accounts.services.validation_services import get_identity_purpose
 from accounts.services.cache_services import (
     can_resend,
     set_resend_cooldown,
@@ -37,8 +38,7 @@ from core.decorators.captcha import captcha_required
 from core.permissions import UserIsNotAuthenticated, UserIsAuthenticated
 from core.throttles.throttles import (
     CustomAnonThrottle,
-    ResendOTPOrLinkThrottle,
-    TokenRefreshAnonThrottle
+    TokenRefreshUserThrottle
 )
 
 
@@ -70,6 +70,20 @@ class IdentitySubmissionAPIView(APIView):
         serializer = IdentitySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         identity = serializer.validated_data['identity']
+
+        # Determine purpose first without sending anything
+        purpose = get_identity_purpose(identity)
+        
+        # Check cooldown with the correct purpose
+        can_send, seconds_left = can_resend(identity, purpose)
+        if not can_send:
+            return Response(
+                {
+                    "detail": f"لطفا {seconds_left // 60} دقیقه و {seconds_left % 60} ثانیه دیگر برای ارسال مجدد صبر کنید",
+                    "cooldown_seconds": seconds_left
+                },
+                status=429
+            )
 
         try:
             message, purpose, next_url = handle_identity_submission(identity)
@@ -158,49 +172,6 @@ class LinkVerificationAPIView(APIView):
             return Response({'detail': 'خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید'}, status=500)
 
 
-@extend_schema(**resend_otp_or_link_schema)
-class ResendOTPOrLinkAPIView(APIView):
-    """
-    Resends a verification OTP or confirmation link to the given identity.
-    Validates the identity & Checks cooldown if allowe resend
-
-    Accepts:
-    - `identity`: Email or phone number
-    - `cf-turnstile-response`: CAPTCHA token (if enabled)
-
-    Protected with: CAPTCHA (Cloudflare Turnstile) and 
-    Rate-limited via ResendOTPOrLinkThrottle (returns 429 on cooldown)
-    restrict access authenticated users.
-    """
-    authentication_classes = []  # No authentication required
-    permission_classes = [UserIsNotAuthenticated]
-    throttle_classes = [ResendOTPOrLinkThrottle]
-
-    @captcha_required
-    def post(self, request):
-        serializer = IdentitySerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        identity = serializer.validated_data['identity']
-
-        can_send, seconds_left = can_resend(identity)
-        if not can_send:
-            return Response(
-                {
-                    "detail": f".لطفا {seconds_left // 60} دقیقه و {seconds_left % 60} ثانیه دیگر برای ارسال مجدد صبر کنید",
-                    "cooldown_seconds": seconds_left
-                },
-                status=429
-            )
-        try:
-            message, purpose, next_url = handle_identity_submission(identity)
-            set_resend_cooldown(identity, purpose=purpose, timeout=2 * 60)
-            logger.info(f"resending for {identity}")
-            return Response({'detail': message, "next_url": next_url, "purpose": purpose}, status=200)
-        except Exception:
-            logger.error(f"Error resending for {identity}", exc_info=True)
-            return Response({'detail': ".خطای ناشناخته‌ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
-
-
 @extend_schema(**password_login_schema)
 class PasswordLoginAPIView(APIView):
     """
@@ -212,7 +183,7 @@ class PasswordLoginAPIView(APIView):
     - `cf-turnstile-response`: CAPTCHA token (if enabled)
 
     Protected with: CAPTCHA (Cloudflare Turnstile) and 
-    Rate-limited via ResendOTPOrLinkThrottle (returns 429 on cooldown)
+    Rate-limited via CustomAnonThrottle (returns 429 Too Many Requests).
     restrict access authenticated users.
     """
     authentication_classes = []  # No authentication required
@@ -266,4 +237,4 @@ class CustomTokenRefreshView(TokenRefreshView):
     Custom Token Refresh View to handle token refresh requests.
     Inherits from SimpleJWT's TokenRefreshView.
     """
-    throttle_classes = [TokenRefreshAnonThrottle]  # Prevent abuse by limiting request rate
+    throttle_classes = [TokenRefreshUserThrottle]  # Prevent abuse by limiting request rate

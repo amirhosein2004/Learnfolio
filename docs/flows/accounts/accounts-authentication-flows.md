@@ -20,37 +20,31 @@
 
 ![flow confirm email](../../assets/accounts/confirm-email.png)
 
-## 4. فلو ارسال مجدد کد/لینک
-
-این فلو برای ارسال مجدد کد OTP یا لینک تایید استفاده می‌شود.
-
-![flow resend otp/link](../../assets/accounts/resend.png)
-
-## 5. فلو ورود با رمز عبور
+## 4. فلو ورود با رمز عبور
 
 این فلو برای ورود کاربران با استفاده از رمز عبور استفاده می‌شود.
 
 ![flow login password identity](../../assets/accounts/login-password.png)
 
-## 6. فلو خروج کاربر
+## 5. فلو خروج کاربر
 
 این فلو برای خروج کاربر و ابطال توکن‌ها استفاده می‌شود.
 
 ![flow logout](../../assets/accounts/logout.png)
 
-## 7. فلو تجدید توکن
+## 6. فلو تجدید توکن
 
 این فلو برای تجدید access token با استفاده از refresh token استفاده می‌شود.
 
 ![flow renewal token](../../assets/accounts/renewal-token.png)
 
-## 8. فلو کامل احراز هویت (جامع)
+## 7. فلو کامل احراز هویت (جامع)
 
 این نمودار فلو کامل احراز هویت از ابتدا تا انتها را نشان می‌دهد.
 
 ![flow completly authorization](../../assets/accounts/completly-authorization.png)
 
-## 9. فلو مدیریت کش و Rate Limiting
+## 8. فلو مدیریت کش و Rate Limiting
 
 این نمودار نحوه مدیریت کش و محدودیت‌های نرخ درخواست را نشان می‌دهد.
 
@@ -82,14 +76,6 @@
 - **منطق**: verify_email_token() → ایجاد کاربر جدید → تولید JWT
 - **خروجی**: access_token + refresh_token
 - **مسیر**: `/api/auth/v1/verify-link/`
-
-#### **ResendOTPOrLinkAPIView**
-- **متد**: `post(request)`
-- **عملکرد**: ارسال مجدد کد OTP یا لینک تایید
-- **اعتبارسنجی**: CAPTCHA + ResendOTPOrLinkThrottle + IdentitySerializer
-- **منطق**: can_resend() → handle_identity_submission() → set_resend_cooldown()
-- **محدودیت**: cooldown 2 دقیقه‌ای بین درخواست‌ها
-- **مسیر**: `/api/auth/v1/resend-otp-or-link/`
 
 #### **PasswordLoginAPIView**
 - **متد**: `post(request)`
@@ -146,7 +132,6 @@
 
 #### **Rate Limiting**
 - **CustomAnonThrottle**: محدودیت برای کاربران ناشناس
-- **ResendOTPOrLinkThrottle**: محدودیت ویژه ارسال مجدد
 - **TokenRefreshAnonThrottle**: محدودیت تجدید توکن
 
 #### **Permissions**

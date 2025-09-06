@@ -8,10 +8,6 @@ class CustomAnonThrottle(AnonRateThrottle):
 class CustomUserThrottle(UserRateThrottle):
     scope = 'custom_action'
 
-# Custom throttle class for anonymous users resend otp or link requests
-class ResendOTPOrLinkThrottle(AnonRateThrottle):
-    scope = 'resend_otp_or_link'
-
-# Custom throttle class for token refresh requests for anonymous users
-class TokenRefreshAnonThrottle(AnonRateThrottle):
-    scope = 'token_refresh_anon'
+# Custom throttle class for token refresh requests for authenticated users
+class TokenRefreshUserThrottle(UserRateThrottle):
+    scope = 'token_refresh_user'

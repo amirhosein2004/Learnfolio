@@ -27,7 +27,7 @@ from accounts.api.v1.serializers.profile_serializers import (
     ConfirmationLinkEmailUpdateSerializer
 )
 from accounts.services.profile_services import handle_identity_update, delete_user_account
-from accounts.services.cache_services import set_resend_cooldown
+from accounts.services.cache_services import set_resend_cooldown, can_resend
 from core.permissions import UserIsAuthenticated, UserAdminIsAuthenticated
 from core.throttles.throttles import CustomUserThrottle
 from accounts.models import AdminProfile
@@ -160,6 +160,16 @@ class UserUpdateEmailOrPhoneAPIView(APIView):
         serializer = UserPhoneOrEmailUpdateSerilizer(data=request.data)
         serializer.is_valid(raise_exception=True)
         identity = serializer.validated_data['identity']
+
+        can_send, seconds_left = can_resend(identity, "update_identity")
+        if not can_send:
+            return Response(
+                {
+                    "detail": f"لطفا {seconds_left // 60} دقیقه و {seconds_left % 60} ثانیه دیگر برای ارسال مجدد صبر کنید",
+                    "cooldown_seconds": seconds_left
+                },
+                status=429
+            )
 
         try:
             message, purpose, next_url = handle_identity_update(identity)
