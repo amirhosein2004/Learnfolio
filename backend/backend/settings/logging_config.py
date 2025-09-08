@@ -18,7 +18,7 @@ IS_DEV = ENV == "dev"
 LOG_LEVEL = "DEBUG" if IS_DEV else "INFO"
 
 # Apps that require separate log files
-APPS = ["accounts", "core", "blog"]
+APPS = ["accounts", "core", "blog", "education"]
 
 def make_handler(filename):
     """

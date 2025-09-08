@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'accounts',
     'core',
     "blog",
+    "education",
 
     # third party
     'rest_framework',         # Enables Django REST API support
