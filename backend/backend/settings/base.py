@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'ckeditor',               # Rich text editor
     'ckeditor_uploader',      # File upload support for CKEditor
     'django_filters',         # Django filter backend
+    'ordered_model',          # Drag & drop ordering for models
 ]
 
 # Middleware configuration
