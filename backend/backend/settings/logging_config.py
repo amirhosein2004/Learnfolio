@@ -15,10 +15,10 @@ load_dotenv(BASE_DIR.parent / '.env')
 # 🔍 Determine current environment: development or production
 ENV = os.getenv("DJANGO_ENV", "dev").lower()
 IS_DEV = ENV == "dev"
-LOG_LEVEL = "DEBUG" if IS_DEV else "INFO"
+LOG_LEVEL = "INFO" if IS_DEV else "WARNING"
 
 # Apps that require separate log files
-APPS = ["accounts", "core", "blog"]
+APPS = ["accounts", "core", "blog", "education"]
 
 def make_handler(filename):
     """

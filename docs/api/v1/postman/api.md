@@ -86,45 +86,6 @@
 							"response": []
 						},
 						{
-							"name": "resend-otp-or-link",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNjMyODM2LCJpYXQiOjE3NTM2MzE5MzYsImp0aSI6ImIxOGVhNGE0NzkwZTQ2YjFiNzYwZmJmZjUxMzM0YzIyIiwidXNlcl9pZCI6NH0.mRL9db7vZheVZ8pKtMJaJDjnBjoENk2qSu5raNLQ8Dw",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"identity\": \"amiiiriii.lamk.10@gmail.com\",\r\n    \"cf-turnstile-response\": \"token\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8000/api/accounts/v1/auth/resend-otp-or-link/",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8000",
-									"path": [
-										"api",
-										"accounts",
-										"v1",
-										"auth",
-										"resend-otp-or-link",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "login-password",
 							"request": {
 								"method": "POST",
@@ -969,7 +930,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2NjY3NjU1LCJpYXQiOjE3NTY2NjY3NTUsImp0aSI6Ijg5YjQ1NWI0ZTZkMDQ4OTJiY2U2YzQ1MmYwY2FjOTVhIiwidXNlcl9pZCI6Mn0.43lKyXBuyJZwH8xsxCe1UDzAU0fnegAHb2bW3oHPvpI",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2NzIyNTI5LCJpYXQiOjE3NTY3MjE2MjksImp0aSI6IjVjZmE4ZDBjMGJiZTQ3ZTBiYjA5ZTEzODA5ZTk5ZDg5IiwidXNlcl9pZCI6Mn0.YwC6Zxh2BDWMrR0EK-tMIpwdmYi88AhjF6hCfU8z-tM",
 								"type": "text"
 							}
 						],
@@ -997,7 +958,7 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/blog/v1/blogs/test/",
+							"raw": "http://localhost:8000/api/blog/v1/blogs/tet/",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1008,7 +969,7 @@
 								"blog",
 								"v1",
 								"blogs",
-								"test",
+								"tet",
 								""
 							]
 						}

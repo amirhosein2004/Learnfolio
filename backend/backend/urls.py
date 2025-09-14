@@ -20,6 +20,9 @@ urlpatterns = [
 
     # Blog app URLs
     path('api/blog/', include('blog.urls')),
+
+    # Education app URLs
+    path('api/education/', include('education.urls')),
 ]
 
 # active in dev 

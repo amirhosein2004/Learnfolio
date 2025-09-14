@@ -3,12 +3,12 @@ from rest_framework import viewsets, filters
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from blog.models import Blog
-from blog.api.v1.serializers.blog_serializers import BlogSerializer
+from blog.api.v1.serializers.blog_serializers import BlogDetailSerializer, BlogListSerializer
 from core.permissions import UserAdminOrReadOnly
 from core.pagination import BlogPagination
 from rest_framework.exceptions import ValidationError, NotFound
 from django.http import Http404
-from blog.schema_docs.v1.blog_schema import (
+from blog.schema_docs.v1 import (
     blog_list_schema,
     blog_detail_schema,
     blog_create_schema,
@@ -34,12 +34,19 @@ class BlogViewSet(viewsets.ModelViewSet):
     API endpoint for blog management.
     """
     queryset = Blog.objects.all()
-    serializer_class = BlogSerializer
     permission_classes = [UserAdminOrReadOnly]
     pagination_class = BlogPagination
     lookup_field = 'slug'
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['title']
+
+    def get_serializer_class(self):
+        """
+        Return the serializer class to use.
+        """
+        if self.action == 'list':
+            return BlogListSerializer
+        return BlogDetailSerializer
     
     def perform_create(self, serializer):
         """

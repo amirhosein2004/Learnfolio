@@ -1,7 +1,6 @@
 from .auth.submit_identity import identity_submit_schema
 from .auth.verify_otp import otp_verification_schema
 from .auth.verify_link import link_verification_schema
-from .auth.resend_otp_or_link import resend_otp_or_link_schema
 from .auth.login_password import password_login_schema
 from .auth.logout import logout_schema
 
@@ -26,7 +25,6 @@ __all__ = [
     "identity_submit_schema",
     "otp_verification_schema",
     "link_verification_schema",
-    "resend_otp_or_link_schema",
     "password_login_schema",
     "logout_schema",
     # password

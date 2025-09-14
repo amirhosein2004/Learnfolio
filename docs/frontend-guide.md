@@ -53,7 +53,6 @@
 - `POST /submit-identity/`: ارسال ایمیل یا شماره موبایل برای دریافت کد/لینک تایید.
 - `POST /verify-otp/`: تایید کد ۶ رقمی ارسال شده.
 - `POST /verify-link/`: تایید لینک ارسال شده به ایمیل.
-- `POST /resend-otp-or-link/`: ارسال مجدد کد یا لینک.
 - `POST /login-password/`: ورود با استفاده از رمز عبور.
 - `POST /token/refresh/`: دریافت Access Token جدید با استفاده از Refresh Token.
 - `POST /logout/`: خروج کاربر و باطل کردن Refresh Token.

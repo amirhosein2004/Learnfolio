@@ -37,7 +37,7 @@ from core.throttles.throttles import (
     CustomAnonThrottle,
     CustomUserThrottle
 )
-from accounts.services.cache_services import set_resend_cooldown
+from accounts.services.cache_services import set_resend_cooldown, can_resend
 
 User = get_user_model()
 
@@ -66,6 +66,17 @@ class RequestPasswordResetAPIView(APIView):
         serializer = IdentitySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         identity = serializer.validated_data['identity']
+
+        # Check cooldown for password reset purpose
+        can_send, seconds_left = can_resend(identity, "reset_password")
+        if not can_send:
+            return Response(
+                {
+                    "detail": f"لطفا {seconds_left // 60} دقیقه و {seconds_left % 60} ثانیه دیگر برای ارسال مجدد صبر کنید",
+                    "cooldown_seconds": seconds_left
+                },
+                status=429
+            )
 
         try:
             message, purpose, next_url = handle_password_reset(identity)
