@@ -13,7 +13,7 @@ class PackageAdmin(admin.ModelAdmin):
 
 @admin.register(Video)
 class VideoAdmin(OrderedModelAdmin):
-    list_display = ['title', 'package', 'is_free', 'download_count', 'move_up_down_links']
+    list_display = ['title', 'package', 'is_free', 'move_up_down_links']
     list_filter = ['is_free', 'package', 'created_at']
     search_fields = ['title', 'description']
     prepopulated_fields = {'slug': ('title',)}

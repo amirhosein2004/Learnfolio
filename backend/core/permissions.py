@@ -64,3 +64,56 @@ class UserAdminOrReadOnly(BasePermission):
 
         # if admin check ia authenticated
         return request.user.is_authenticated
+
+
+class VideoPermission(BasePermission):
+    """
+    Custom permission for Video model:
+    - Only admin can POST, PUT, PATCH, DELETE
+    - For safe methods (GET, HEAD, OPTIONS):
+        * If video is_free=True → everyone can access (even anonymous)
+        * If video is not free:
+            - Admin has access
+            - Authenticated users who purchased the package (UserPackage exists)
+            - Otherwise PermissionDenied
+    """
+    
+    def has_permission(self, request, view):
+        # For unsafe methods, only admin can perform them
+        if request.method not in SAFE_METHODS:
+            if not request.user.is_staff:
+                raise PermissionDenied(detail=".شما به این بخش دسترسی ندارید")
+            return request.user.is_authenticated
+        
+        # For safe methods, we need to check object-level permissions
+        # Return True here and handle the logic in has_object_permission
+        return True
+    
+    def has_object_permission(self, request, view, obj):
+        # For unsafe methods, only admin can perform them
+        if request.method not in SAFE_METHODS:
+            if not request.user.is_staff:
+                raise PermissionDenied(detail=".شما به این بخش دسترسی ندارید")
+            return request.user.is_authenticated
+        
+        # For safe methods (GET, HEAD, OPTIONS)
+        # If video is free, everyone can access
+        if obj.is_free:
+            return True
+        
+        # If video is not free, check additional conditions
+        # Admin always has access
+        if request.user.is_staff:
+            return True
+        
+        # Check if user is authenticated and has purchased the package
+        if request.user.is_authenticated:
+            # Import here to avoid circular imports
+            from education.models import UserPackage
+            
+            # Check if user has purchased this video's package
+            if UserPackage.objects.filter(user=request.user, package=obj.package).exists():
+                return True
+        
+        # If none of the above conditions are met, deny access
+        raise PermissionDenied(detail=".برای دسترسی به این ویدیو باید پکیج مربوطه را خریداری کنید")
