@@ -2,9 +2,22 @@ from rest_framework import serializers
 from blog.models import Blog
 from rest_framework.validators import UniqueValidator
 
-class BlogSerializer(serializers.ModelSerializer):
+
+class BlogListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Blog
+        fields = ['id', 'title', 'slug', 'image', 'author', 'created_at']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data['author'] is None:
+            data['author'] = ""
+        return data
+
+
+class BlogDetailSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
-    slug = serializers.StringRelatedField(read_only=True)
+    slug = serializers.SlugField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
     title = serializers.CharField(
@@ -54,8 +67,6 @@ class BlogSerializer(serializers.ModelSerializer):
 
     # NOTE: later we can add advance image validation for scan image file
     def validate_image(self, value):
-        if not hasattr(value, 'file') and not hasattr(value, 'read'):
-            raise serializers.ValidationError("فایل تصویر معتبر نیست. لطفاً یک تصویر معتبر انتخاب کنید")
         if value.size > 5 * 1024 * 1024:
             raise serializers.ValidationError("حجم تصویر باید کمتر از ۵ مگابایت باشد")
         return value
