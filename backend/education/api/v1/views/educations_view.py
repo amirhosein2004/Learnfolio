@@ -1,6 +1,4 @@
 import logging
-import os
-from urllib.parse import quote
 from rest_framework import viewsets, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -13,13 +11,36 @@ from education.api.v1.serializers.educations_serializers import (
 from core.permissions import UserAdminOrReadOnly, VideoPermission
 from core.pagination import PackagePagination, VideoPagination
 from rest_framework.exceptions import ValidationError, NotFound
-from django.http import Http404, HttpResponse, FileResponse
-from django.core.files.storage import default_storage
+from django.http import Http404
+from drf_spectacular.utils import extend_schema_view, extend_schema
+from education.schema_docs.v1 import (
+    package_list_schema,
+    package_retrieve_schema,
+    package_create_schema,
+    package_update_schema,
+    package_delete_schema,
+    video_list_schema,
+    video_retrieve_schema,
+    video_create_schema,
+    video_update_schema,
+    video_delete_schema,
+    video_reorder_schema,
+    video_download_schema,
+)
+from education.services.video_service import VideoService
 
 
 logger = logging.getLogger(__name__)
 
 
+@extend_schema_view(
+    list=extend_schema(**package_list_schema),
+    retrieve=extend_schema(**package_retrieve_schema),
+    create=extend_schema(**package_create_schema),
+    update=extend_schema(**package_update_schema),
+    partial_update=extend_schema(**package_update_schema),
+    destroy=extend_schema(**package_delete_schema),
+)
 class PackageViewSet(viewsets.ModelViewSet):
     """
     API endpoint for package management with filtering options:
@@ -108,6 +129,16 @@ class PackageViewSet(viewsets.ModelViewSet):
             return Response({'detail': ".خطای ناشناخته ای رخ داده است لطفا دوباره تلاش کنید"}, status=500)
 
 
+@extend_schema_view(
+    list=extend_schema(**video_list_schema),
+    retrieve=extend_schema(**video_retrieve_schema),
+    create=extend_schema(**video_create_schema),
+    update=extend_schema(**video_update_schema),
+    partial_update=extend_schema(**video_update_schema),
+    destroy=extend_schema(**video_delete_schema),
+    reorder=extend_schema(**video_reorder_schema),
+    download=extend_schema(**video_download_schema),
+)
 class VideoViewSet(viewsets.ModelViewSet):
     """
     API endpoint for video management within packages
@@ -131,60 +162,29 @@ class VideoViewSet(viewsets.ModelViewSet):
         """
         Reorder videos 
         """
-        try:
-            new_order = request.data.get("order", [])
-            
-            videos_to_update = []
-            queryset = self.get_queryset()
-            
-            for index, video_id in enumerate(new_order):
-                try:
-                    video = queryset.get(id=video_id)
-                    video.order = index
-                    videos_to_update.append(video)
-                except Video.DoesNotExist:
-                    continue
-
-            if videos_to_update:
-                Video.objects.bulk_update(videos_to_update, ['order'])
-            
-            return Response({'message': 'ترتیب ویدیوها با موفقیت تغییر کرد'}, status=200)
-        except Exception as e:
-            logger.error(f"Error reordering videos: {e}", exc_info=True)
-            return Response({'detail': 'خطا در تغییر ترتیب ویدیوها'}, status=500)
+        new_order = request.data.get("order", [])
+        queryset = self.get_queryset()
+        
+        success, message = VideoService.reorder_videos(queryset, new_order)
+        
+        if success:
+            return Response({'message': message}, status=200)
+        else:
+            return Response({'detail': message}, status=500)
 
     @action(detail=True, methods=['get'], url_path='download')
     def download(self, request, slug=None, package_slug=None):
         """
         Simplified video download - works for both local and cloud storage
-            """
+        """
         try:
             video = self.get_object()
-            if not video.video_file or not default_storage.exists(video.video_file.name):
-                return Response({'detail': 'فایل ویدیو یافت نشد'}, status=404)
-
-            video.increment_download_count()
-            file_name = os.path.basename(video.video_file.name)
-            file_path = getattr(video.video_file, 'path', None)
-
-            try:
-                if file_path and os.path.exists(file_path):
-                    # local file
-                    response = FileResponse(
-                        open(file_path, 'rb'),
-                        content_type='application/octet-stream'
-                    )
-                else:
-                    # cloud file
-                    with default_storage.open(video.video_file.name, 'rb') as f:
-                        response = HttpResponse(f.read(), content_type='application/octet-stream')
-
-                response['Content-Disposition'] = f'attachment; filename="{quote(file_name)}"'
-                return response 
-
-            except Exception as e:
-                logger.error(f"Error serving file: {e}", exc_info=True)
-                return Response({'detail': 'خطا در دانلود فایل'}, status=500)
+            success, response_or_error = VideoService.prepare_video_download(video)
+            
+            if success:
+                return response_or_error
+            else:
+                return Response({'detail': response_or_error}, status=404 if 'یافت نشد' in response_or_error else 500)
                 
         except Video.DoesNotExist:
             return Response({'detail': 'ویدیو مورد نظر یافت نشد'}, status=404)

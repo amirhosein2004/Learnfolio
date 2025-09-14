@@ -8,7 +8,7 @@ from core.permissions import UserAdminOrReadOnly
 from core.pagination import BlogPagination
 from rest_framework.exceptions import ValidationError, NotFound
 from django.http import Http404
-from blog.schema_docs.v1.blog_schema import (
+from blog.schema_docs.v1 import (
     blog_list_schema,
     blog_detail_schema,
     blog_create_schema,
