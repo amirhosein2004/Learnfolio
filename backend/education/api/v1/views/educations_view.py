@@ -3,7 +3,7 @@ from rest_framework import viewsets, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
-from education.models import Package, Video
+from education.models import Package, Video, UserPackage
 from education.api.v1.serializers.educations_serializers import (
     PackageSerializer, VideoSerializer,
     PackageListSerializer, VideoListSerializer
@@ -80,10 +80,19 @@ class PackageViewSet(viewsets.ModelViewSet):
         Retrieve a package and increment view count
         """
         instance = self.get_object()
+
         if not request.user.is_staff:
             instance.increment_view_count()
+
+        is_access = False
+        if request.user.is_authenticated:
+            is_access = instance.purchasers.filter(user=request.user).exists()
+            
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        data = serializer.data
+        data['is_access'] = is_access 
+        
+        return Response(data)
     
     def create(self, request, *args, **kwargs):
         """

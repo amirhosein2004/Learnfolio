@@ -12,6 +12,11 @@ ENV PYTHONUNBUFFERED 1             # Disable Python output buffering
 # Set working directory inside the container
 WORKDIR /app
 
+# ---- Install system dependencies ----
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy requirements folder
 COPY requirements/ ./requirements/
 
